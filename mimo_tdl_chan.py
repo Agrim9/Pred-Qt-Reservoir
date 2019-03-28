@@ -7,6 +7,76 @@ import numpy as np
 import scipy.linalg as la
 import pdb
 
+def sH_lift(A,B,ret_vec=False):
+    p=A.shape[1]
+    n=A.shape[0]
+    X=np.matrix(A)
+    Y=np.matrix(B)
+    Xu=X[0:p]
+    Xl=X[p:n]
+    Yu=Y[0:p]
+    Yl=Y[p:n]
+    C=2*la.inv((Xu.H+Yu.H))*skew(Yu.H*Xu+Xl.H*Yl)*la.inv(Xu+Yu)
+    B=(Yl-Xl)*la.inv(Xu+Yu)
+    T=np.bmat([[C,-B.H],[B,np.zeros((n-p,n-p))]])
+    cvecC=np.array(C[np.triu_indices(C.shape[0],1)]).flatten()
+    rvecC=np.append(np.imag(np.diagonal(C)),np.append(np.imag(cvecC),np.real(cvecC)))
+    cvecB=np.squeeze(np.asarray(np.reshape(B,(1,(n-p)*p))))
+    rvecB=np.append(np.imag(cvecB),np.real(cvecB))
+    vecT=np.append(rvecC,rvecB)
+    if(ret_vec):
+        return T,vecT
+    else:
+        return T
+
+def vec_to_tangent(vec,n,p):
+    C=np.diag(1j*vec[:p])
+    C[np.triu_indices(C.shape[0],1)]=1j*vec[p:p+(p*(p-1)/2)]+vec[p+(p*(p-1)/2):p+p*(p-1)]
+    C[np.tril_indices(C.shape[0],-1)]=1j*vec[p:p+(p*(p-1)/2)]-vec[p+(p*(p-1)/2):p+p*(p-1)]
+    vec_recon=1j*vec[p+p*(p-1):p+p*(p-1)+p*(n-p)]+vec[p+p*(p-1)+p*(n-p):p+p*(p-1)+2*p*(n-p)]
+    B=np.matrix(np.reshape(vec_recon,(n-p,p)))
+    T=np.bmat([[C,-B.H],[B,np.zeros((n-p,n-p))]])
+    return T
+
+def sH_retract(A,B):
+    p=A.shape[1]
+    n=A.shape[0]
+    X=np.matrix(A)
+    W=np.matrix(B)
+    Cay_W=(np.identity(n)+W)*la.inv(np.identity(n)-W)
+    un_normQT= Cay_W*X
+    norm_Qt= un_normQT/la.norm(un_normQT,axis=0)
+    return norm_Qt
+
+def skew(A):
+    A_mat=np.matrix(A)
+    return 0.5*(A.H-A)
+
+def Ds_metric(A,B):
+    A_mat=np.matrix(A)
+    B_mat=np.matrix(B)
+    return A.shape[1]-np.trace(np.square(np.abs(A_mat.H*B_mat)))
+
+def chordal_dist(A,B):
+    A_mat=np.matrix(A)
+    B_mat=np.matrix(B)
+    return np.sqrt(np.abs(A.shape[1]-np.linalg.norm(A_mat.H*B_mat,'fro')**2))
+
+def grassCD_2(A,B):
+    C=np.vdot(A,B)
+    rho=np.real(C*np.conjugate(C))
+    return (1-rho)
+
+def stiefCD(A,B):
+    A_mat=np.matrix(A)
+    B_mat=np.matrix(B)
+    CD_2=np.sum([grassCD_2(np.array(A_mat[:,i]),np.array(B_mat[:,i])) for i in range(A_mat.shape[1])])
+    if(CD_2<0):
+        pdb.set_trace()
+        return -1
+    return np.sqrt(CD_2)
+
+    
 def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
     diff_frob_norm = lambda A,B:np.linalg.norm(A-B, 'fro')
     trials=0

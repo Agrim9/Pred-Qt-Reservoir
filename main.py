@@ -43,6 +43,16 @@ reservoir_obj=reservoir(Nt,Nr,past_vals)
 vec_list=np.load('./Codebooks/Pred_qt/base_quant_cb.npy')
 sHt_list=[vec_to_tangent(vec,Nt,Nr) for vec in vec_list]
 fin_qt_U=np.zeros(num_evols,Nr*(2*Nt-Nr+1))
+# Use Stiefel Chordal Distance as norm
+norm_fn='stiefCD'
 for chan_inst in range(num_chans):
 	for i in range(1,num_evols):
-
+		realU=vec_to_semiunitary(data[chan_inst][i],Nt,Nr)
+		if(i<past_vals):
+			predU=vec_to_semiunitary(ind_qt_data[chan_inst][i],Nt,Nr)
+		else:
+			predU=vec_to_semiunitary(reservoir_obj.get_output(),Nt,Nr)
+		qtiz_err,qtiz_U=qtisn(predU,rU,1.5,20,sHt_list,norm_fn,sk=0.0)
+		if(i>past_vals):
+			#Update Output coupler
+			reservoir_obj.update_output_coupler(semiunitary_to_vec(qtiz_U))
