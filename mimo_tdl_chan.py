@@ -76,7 +76,7 @@ def stiefCD(A,B):
         return -1
     return np.sqrt(CD_2)
 
-    
+
 def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
     diff_frob_norm = lambda A,B:np.linalg.norm(A-B, 'fro')
     trials=0
@@ -149,6 +149,8 @@ def vec_to_semiunitary(vec,m,n):
         prev=nex
         nex+=2*m-2*(i+1)
         i+=1
+    for i in range(n):
+        U[:,i]=U[:,i]/la.norm(U[:,i])
     return U
 
 def semiunitary_to_vec(U):
