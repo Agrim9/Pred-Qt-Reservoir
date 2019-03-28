@@ -20,8 +20,9 @@ class reservoir:
 		self.output_history = np.zeros((train_vals,self.output_dim))
 		self.history_pointer=0
 
-	def get_output(self):
-		return np.matmul(self.output_coupler, self.reservoir_state)
+	def get_output(self,inp_vec):
+		val = np.add(np.matmul(self.A, self.reservoir_state), np.matmul(self.input_coupler, inp_vec))
+		return np.matmul(self.output_coupler, np.tanh(val))
 
 	def update_output_coupler(self):
 		self.output_coupler=np.sum(np.array([np.outer(self.output_history[j],self.reservoir_history[j])/la.norm(self.reservoir_history[j])**2\
@@ -57,9 +58,9 @@ for chan_inst in range(num_chans):
 	for i in range(1,num_evols):
 		realU=vec_to_semiunitary(data[chan_inst][i][subcarrier],Nt,Nr)
 		if(i<past_vals):
-			predU=vec_to_semiunitary(ind_qt_data[chan_inst][i-1][subcarrier],Nt,Nr)
+			predU=vec_to_semiunitary(fin_qt_U[i-1],Nt,Nr)
 		else:
-			predU=vec_to_semiunitary(reservoir_obj.get_output(),Nt,Nr)
+			predU=vec_to_semiunitary(reservoir_obj.get_output(fin_qt_U[i-1]),Nt,Nr)
 			# pdb.set_trace()
 		qtiz_err[i-1],qtiz_U[i]=qtisn(predU,realU,1.5,20,sHt_list,norm_fn,sk=0.0)
 		fin_qt_U[i]=semiunitary_to_vec(qtiz_U[i])
