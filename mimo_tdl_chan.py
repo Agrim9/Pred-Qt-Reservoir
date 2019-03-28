@@ -7,6 +7,31 @@ import numpy as np
 import scipy.linalg as la
 import pdb
 
+def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
+    diff_frob_norm = lambda A,B:np.linalg.norm(A-B, 'fro')
+    trials=0
+    sp=0.0
+    sm=0.0
+    while(trials<num_iter):
+        sp=g**(np.min(sk+1,0))
+        sm=g**(sk-1)
+        # Qp=[np.matmul(la.expm(sp*sH),pU) for sH in sH_list]
+        # Qm=[np.matmul(la.expm(sm*sH),pU) for sH in sH_list]
+        Qp=[sH_retract(pU,sp*sH) for sH in sH_list]
+        Qm=[sH_retract(pU,sm*sH) for sH in sH_list]
+        Q=Qp+Qm
+        if(norm_fn=="diff_frob_norm"):
+            chordal_dists=np.array([diff_frob_norm(Q[i],rU) for i in range(len(Q))])
+        else:
+            chordal_dists=np.array([stiefCD(Q[i],rU) for i in range(len(Q))])
+
+        trials=trials+1
+        if(np.argmin(chordal_dists)<len(Q)//2):
+            sk=np.min(sk+1,0)
+        else:
+            sk=sk-1
+    #print("Qtisn error: "+str(np.min(chordal_dists)))
+    return np.min(chordal_dists),Q[np.argmin(chordal_dists)]
 
 def vec_to_unitary(vec,n):
     U=np.zeros((n,n),dtype=complex)
