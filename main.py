@@ -35,8 +35,8 @@ class reservoir:
 		self.output_history[self.history_pointer]=out_vec
 		self.history_pointer=(self.history_pointer+1)%self.train_vals
 
-data=np.load("./Data/ped_1_1000_4_2_norm2.npy")
-ind_qt_data=np.load("./Data/qt_ped_1_1000_4_2_norm2.npy")
+data=np.load("./Data/ped_1_1000_4_2.npy")
+ind_qt_data=np.load("./Data/qt_ped_1_1000_4_2.npy")
 num_chans=1
 num_evols=1000
 Nt=4
