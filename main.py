@@ -35,14 +35,14 @@ class reservoir:
 		self.output_history[self.history_pointer]=out_vec
 		self.history_pointer=(self.history_pointer+1)%self.train_vals
 
-data=np.load("./Data/ped_1_1000_4_2.npy")
-ind_qt_data=np.load("./Data/qt_ped_1_1000_4_2.npy")
+data=np.load("./Data/ped_1_1000_4_2_norm2.npy")
+ind_qt_data=np.load("./Data/qt_ped_1_1000_4_2_norm2.npy")
 num_chans=1
 num_evols=1000
 Nt=4
 Nr=2
-past_vals=80
-train_vals=50
+past_vals=10
+train_vals=5
 reservoir_obj=reservoir(Nt,Nr,train_vals)
 vec_list=np.load('./Codebooks/Pred_qt/base_quant_cb.npy')
 sHt_list=[vec_to_tangent(vec,Nt,Nr) for vec in vec_list]
@@ -61,8 +61,7 @@ for chan_inst in range(num_chans):
 			predU=vec_to_semiunitary(fin_qt_U[i-1],Nt,Nr)
 		else:
 			predU=vec_to_semiunitary(reservoir_obj.get_output(fin_qt_U[i-1]),Nt,Nr)
-			# pdb.set_trace()
-		qtiz_err[i-1],qtiz_U[i]=qtisn(predU,realU,1.5,20,sHt_list,norm_fn,sk=0.0)
+		qtiz_err[i-1],qtiz_U[i]=qtisn(predU,realU,1.1,25,sHt_list,norm_fn,sk=0.0)
 		fin_qt_U[i]=semiunitary_to_vec(qtiz_U[i])
 		reservoir_obj.evolve_reservoir(fin_qt_U[i-1],fin_qt_U[i])
 		if(i>=train_vals):

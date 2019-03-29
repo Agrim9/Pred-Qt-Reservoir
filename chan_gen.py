@@ -37,7 +37,7 @@ Nr=2
 # Simulation Parameters
 number_simulations=1000
 num_chan_realisations=1
-fdts=1e-4
+fdts=3.5*1e-4   
 start_time=time.time()
 save=True
 vec_list=np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nr*(2*Nt-Nr+1)))
@@ -51,7 +51,7 @@ for chan_index in range(num_chan_realisations):
     
     # Generate Channels
     class_obj=MIMO_TDL_Channel(Nt,Nr,c_spec,Ts,num_subcarriers)
-    # class_obj.set_norm_doppler(fdts)
+    class_obj.set_norm_doppler(fdts)
     
     #---------------------------------------------------------------------------
     # Main simulation loop for the algorithm 

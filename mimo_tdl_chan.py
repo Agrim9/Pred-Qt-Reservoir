@@ -96,7 +96,7 @@ def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
             chordal_dists=np.array([stiefCD(Q[i],rU) for i in range(len(Q))])
 
         trials=trials+1
-        if(np.argmin(chordal_dists)<len(Q)//2):
+        if(np.argmin(chordal_dists)<(len(Q)//2)):
             sk=np.min(sk+1,0)
         else:
             sk=sk-1
