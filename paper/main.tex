@@ -1,0 +1,137 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+                                                          % if you need a4paper
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
+                                                          % paper
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+\usepackage{romannum}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{subfig}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{mathtools}
+\usepackage[skipbelow=\topskip,skipabove=\topskip]{mdframed}
+\usepackage{multirow}
+\setlength{\parskip}{0em}
+\usepackage{array}
+\usepackage[font=small]{caption}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+
+\makeatletter
+\let\NAT@parse\undefined
+\makeatother
+\usepackage{hyperref}
+% \hypersetup{citecolor=green}
+
+\title{\LARGE \bf
+Title
+}
+
+
+\author{Agrim Gupta, Pranav Sankhe \\ Kumar Appaiah$^{*}$ \\
+Indian Institute of Technology, Bombay, India \\
+$\{ \text{pranav\_sankhe}\}$@iitb.ac.in \\
+akumar@ee.iitb.ac.in \hspace{1cm}
+% <-this % stops a space
+\thanks{$^{*}$Prof. Kumar Appaiah is a Faculty in Department of Electrical Engineering, IIT Bombay}% <-this % stops a space
+}
+
+\begin{document}
+\captionsetup[figure]{labelfont={bf}, labelformat={simple}, labelsep=colon, name={Figure}}
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+\begin{abstract}
+ %We identify potential applications for this system which range from asset tracking, security, and human-computer interface, to robot navigation and the management of services as diverse as medical care and postal delivery.
+
+
+\textit{Index Terms} - Indoor Localization; WiFi; Received Signal Strength Indicator (RSSI); Long Short-Term Memory Network (LSTM).
+
+% We identify potential applications for this system which range from asset tracking, security, and human-computer interface, to robot navigation and the management of services as diverse as medical care and postal delivery.
+\end{abstract}
+
+
+\section{INTRODUCTION}
+
+
+
+\section{LITERATURE REVIEW}
+
+
+
+\section{APPROACH}
+
+\subsection{System Design}
+
+
+\subsection{Machine Learning Architecture}
+
+
+\subsection{Results}
+\section{Conclusion and Future Work}
+
+\section{Acknowledgements}
+
+% \begin{table}[h]
+% \caption{Testing Results}
+% \label{table_example}
+% \begin{center}
+% \begin{tabular}{|c||c|}
+% \hline
+% Dataset 1 & Two\\
+% \hline
+% Dataset 2 & Two\\
+% \hline
+% Dataset 3 & Four\\
+% \hline
+% Dataset 4 & Four\\
+% \end{tabular}
+% \end{center}
+% \end{table}
+
+\addtolength{\textheight}{-10cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+% \section*{APPENDIX}
+% \subsection{User Datagram Protocol}
+% User Datagram Protocol is an alternative communication protocol to Transmission Control Protocol(TCP).  Both layers are on top of Internet Protocol layer. TCP sends individual packets and is reliable whereas UDP sends messages called datagrams. TCP is more dominant protocol in today’s internet world because of its ability to break datasets into packets, check for and resend lost packets, and reassemble packets in the correct sequence. But these lead to additional data overhead and latency whereas in UDP packets can take different paths between sender and receiver resulting in some packets getting lost or received out of order. Following are some applications and features of this Protocol: 
+% \begin{enumerate}
+% \item Advantageous in applications that can tolerate losing of data
+% \item Allows data to be dropped or received out of order making it suitable for real-time applications such as gaming, video conferences etc.
+% \end{enumerate}
+
+\newpage
+\begin{thebibliography}{99}
+
+\bibitem{c1} S. Sadowski and P. Spachos, "RSSI-Based Indoor Localization With the Internet of Things," in IEEE Access, vol. 6, pp. 30149-30161, 2018.
+
+\end{thebibliography}
+
+\end{document}
