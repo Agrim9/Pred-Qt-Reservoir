@@ -6,6 +6,7 @@ import itpp
 import numpy as np
 import scipy.linalg as la
 import pdb
+np.random.seed(1)
 
 def sH_lift(A,B,ret_vec=False):
     p=A.shape[1]
@@ -78,6 +79,7 @@ def stiefCD(A,B):
 
 
 def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
+    np.random.seed(1)
     diff_frob_norm = lambda A,B:np.linalg.norm(A-B, 'fro')
     trials=0
     sp=0.0
@@ -93,6 +95,7 @@ def qtisn(pU,rU,g,num_iter,sH_list,norm_fn,sk=0.0):
         if(norm_fn=="diff_frob_norm"):
             chordal_dists=np.array([diff_frob_norm(Q[i],rU) for i in range(len(Q))])
         else:
+            # print("Yes")
             chordal_dists=np.array([stiefCD(Q[i],rU) for i in range(len(Q))])
 
         trials=trials+1
@@ -306,6 +309,42 @@ def convex_interpolation(self, S_current, S_next, num_indices_to_be_filled, last
     if(last_fill_flag):
         S_interpolate.append(S_next)
     return np.array(S_interpolate)
+
+def onlyT_pred(center,pred_list):
+    np.random.seed(1)
+    num_iter=20
+    i=0
+    Np=pred_list.shape[0]
+    while (i<num_iter):
+        tangent_list=np.array([lift(center,manifold_pt) for manifold_pt in pred_list])
+        new_tangent=np.sum(tangent_list,axis=0)/Np
+        center=retract(center,new_tangent)
+        i+=1
+    tangent_list=np.array([lift(center,manifold_pt) for manifold_pt in pred_list])
+    sum_itp=np.sum(np.array([(i+1)*tangent_list[i] for i in range(Np)]),axis=0)
+    sum_tp=np.sum(tangent_list,axis=0)
+    T_1=((-sum_itp+((1+Np)/2)*sum_tp)*12)/((Np-1)*(Np**2+Np))
+    T_0=(sum_tp-((Np-1)*Np/2)*T_1)/Np
+    pU=retract(center,T_0+Np*T_1)
+    return pU
+
+
+def lift(A,B):
+    p=A.shape[0]
+    n=A.shape[1]
+    A_mat=np.matrix(A)
+    B_mat=np.matrix(B)
+    T=(np.identity(p)-A_mat*A_mat.H)*B_mat+0.5*A_mat*(A_mat.H*B_mat-B_mat.H*A_mat)
+    return T
+
+def retract(A,V):
+    p=A.shape[0]
+    n=A.shape[1]
+    A_mat=np.matrix(A)
+    V_mat=np.matrix(V)
+    S=(A_mat+V_mat)*la.sqrtm(la.inv((np.identity(n)+V_mat.H*V)))
+    return S
+
 
 # Class for generating a MIMO TDL channel
 class MIMO_TDL_Channel():

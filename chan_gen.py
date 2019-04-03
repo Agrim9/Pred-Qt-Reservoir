@@ -37,7 +37,7 @@ Nr=2
 # Simulation Parameters
 number_simulations=1000
 num_chan_realisations=1
-fdts=3.5*1e-4   
+fdts=1e-5
 start_time=time.time()
 save=True
 vec_list=np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nr*(2*Nt-Nr+1)))
@@ -71,8 +71,8 @@ for chan_index in range(num_chan_realisations):
 pdb.set_trace()
 # Save Channel Generation variables for BER and sumrate evaluation by eavl.py
 if(save==True):
-    np.save("./Data/ped_1_1000_4_2.npy",vec_list)
-    np.save("./Data/qt_ped_1_1000_4_2.npy",qt_vec_list)
+    np.save("./Data/ped_1_1000_4_2_norm5.npy",vec_list)
+    np.save("./Data/qt_ped_1_1000_4_2_norm5.npy",qt_vec_list)
 
 
 
