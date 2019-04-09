@@ -1,6 +1,14 @@
 import numpy as np 
 import networkx 
 from mimo_tdl_chan import *
+import sys
+import signal
+#SIGINT handler
+def sigint_handler(signal, frame):
+    #Do something while breaking
+    pdb.set_trace()
+    sys.exit(0)
+#---------------------------------------------------------------------------
 
 class reservoir:
 	def __init__(self,Nt=4,Nr=2,train_vals=5,num_nodes=60,p1=0.2):
@@ -44,12 +52,13 @@ class reservoir:
 		self.output_history[self.history_pointer]=out_vec
 		self.history_pointer=(self.history_pointer+1)%self.train_vals
 
+signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
-data=np.load("./Data/ped_1_1000_4_2.npy")
-ind_qt_data=np.load("./Data/qt_ped_1_1000_4_2.npy")
-num_chans=1
-num_evols=1000
+data=np.load("./BER_Data/ped_10_100_4_2_norm5.npy")
+ind_qt_data=np.load("./BER_Data/qt_ped_10_100_4_2_norm5.npy")
+num_chans=10
+num_evols=100
 Nt=4
 Nr=2
 past_vals=10
@@ -60,44 +69,55 @@ sHt_list=[vec_to_tangent(vec,Nt,Nr) for vec in vec_list]
 norm_fn='stiefCD'
 # norm_fn='diff_frob_norm'
 feedback_subc=8
-reservoir_objs=[reservoir(Nt,Nr,train_vals) for i in range(feedback_subc)]
-fin_qt_U=np.zeros((feedback_subc,num_evols,Nr*(2*Nt-Nr+1)))
-qtiz_U=np.zeros((feedback_subc,num_evols,Nt,Nr),dtype='complex')
-qtiz_err=np.zeros((feedback_subc,num_evols-1))
-cmp_qtiz_U=np.zeros((feedback_subc,num_evols,Nt,Nr),dtype='complex')
-cmp_qtiz_err=np.zeros((feedback_subc,num_evols-1))
-time_vals=5
-subcarrier_ind=0
+fin_qt_U=np.zeros((num_chans,num_evols,feedback_subc,Nr*(2*Nt-Nr+1)))
+qtiz_U=np.zeros((num_chans,num_evols,feedback_subc,Nt,Nr),dtype='complex')
+qtiz_err=np.zeros((num_chans,num_evols-1,feedback_subc))
+cmp_qtiz_U=np.zeros((num_chans,num_evols,feedback_subc,Nt,Nr),dtype='complex')
+cmp_qtiz_err=np.zeros((num_chans,num_evols-1,feedback_subc))
+time_vals=4
 for chan_inst in range(num_chans):
-	for subcarrier in np.arange(feedback_subc)*9:
-		fin_qt_U[subcarrier_ind][0]=ind_qt_data[chan_inst][0][subcarrier]
-		qtiz_U[subcarrier_ind][0]=vec_to_semiunitary(ind_qt_data[chan_inst][0][subcarrier],Nt,Nr)
-		cmp_qtiz_U[subcarrier_ind][0]=vec_to_semiunitary(ind_qt_data[chan_inst][0][subcarrier],Nt,Nr)
-		subcarrier_ind+=1
+	print("--------------------------------------------------")
+	print("Starting Channel Instance: "+str(chan_inst))
+	print("--------------------------------------------------")
+
+	#Initialise with independent quantization
+	reservoir_objs=[reservoir(Nt,Nr,train_vals) for i in range(feedback_subc)]
 	subcarrier_ind=0
+	for subcarrier in np.arange(feedback_subc)*9:
+		fin_qt_U[chan_inst][0][subcarrier_ind]=ind_qt_data[chan_inst][0][subcarrier]
+		qtiz_U[chan_inst][0][subcarrier_ind]=vec_to_semiunitary(ind_qt_data[chan_inst][0][subcarrier],Nt,Nr)
+		cmp_qtiz_U[chan_inst][0][subcarrier_ind]=vec_to_semiunitary(ind_qt_data[chan_inst][0][subcarrier],Nt,Nr)
+		subcarrier_ind+=1
+	#Do differential/predictive subsequently
 	for i in range(1,num_evols):
 		subcarrier_ind=0
 		for subcarrier in np.arange(feedback_subc)*9:		
 			realU=vec_to_semiunitary(data[chan_inst][i][subcarrier],Nt,Nr)
 			if(i<past_vals):
-				predU=vec_to_semiunitary(fin_qt_U[subcarrier_ind][i-1],Nt,Nr)
+				predU=vec_to_semiunitary(fin_qt_U[chan_inst][i-1][subcarrier_ind],Nt,Nr)
 			else:
-				predU=vec_to_semiunitary(reservoir_objs[subcarrier_ind].get_output(fin_qt_U[subcarrier_ind][i-1]),Nt,Nr)
+				predU=vec_to_semiunitary(reservoir_objs[subcarrier_ind].get_output(fin_qt_U[chan_inst][i-1][subcarrier_ind]),Nt,Nr)
 
 			if(i<time_vals):
-				cmp_predU=cmp_qtiz_U[subcarrier_ind][i-1]
+				cmp_predU=cmp_qtiz_U[chan_inst][i-1][subcarrier_ind]
 			else:
-				cmp_predU=onlyT_pred(cmp_qtiz_U[subcarrier_ind][i-1],\
-					np.array([cmp_qtiz_U[subcarrier_ind][i-j] for j in range(2,1+time_vals)]))
+				cmp_predU=onlyT_pred(cmp_qtiz_U[chan_inst][i-1][subcarrier_ind],\
+					np.array([cmp_qtiz_U[chan_inst][i-j][subcarrier_ind] for j in range(2,1+time_vals)]))
 
-			qtiz_err[subcarrier_ind][i-1],qtiz_U[subcarrier_ind][i]=qtisn(predU,realU,1.2,16,sHt_list,norm_fn,sk=0.0)
-			cmp_qtiz_err[subcarrier_ind][i-1],cmp_qtiz_U[subcarrier_ind][i]=qtisn(cmp_predU,realU,1.2,16,sHt_list,norm_fn,sk=0.0)
-			fin_qt_U[subcarrier_ind][i]=semiunitary_to_vec(qtiz_U[subcarrier_ind][i])
-			reservoir_objs[subcarrier_ind].evolve_reservoir(fin_qt_U[subcarrier_ind][i-1],fin_qt_U[subcarrier_ind][i])
+			qtiz_err[chan_inst][i-1][subcarrier_ind],qtiz_U[chan_inst][i][subcarrier_ind]=qtisn(predU,realU,1.2,16,sHt_list,norm_fn,sk=0.0)
+			cmp_qtiz_err[chan_inst][i-1][subcarrier_ind],cmp_qtiz_U[chan_inst][i][subcarrier_ind]=qtisn(cmp_predU,realU,1.2,16,sHt_list,norm_fn,sk=0.0)
+			fin_qt_U[chan_inst][i][subcarrier_ind]=semiunitary_to_vec(qtiz_U[chan_inst][i][subcarrier_ind])
+			reservoir_objs[subcarrier_ind].evolve_reservoir(fin_qt_U[chan_inst][i-1][subcarrier_ind],fin_qt_U[chan_inst][i][subcarrier_ind])
 			if(i>=2):
 				reservoir_objs[subcarrier_ind].update_output_coupler()
 				# reservoir_objs[subcarrier_ind].update_input_coupler(fin_qt_U[subcarrier_ind][i-1],fin_qt_U[subcarrier_ind][i])
 			subcarrier_ind+=1
-		print("Channel Evolution: "+str(i)+" Qtisn Error: "+str(np.mean(qtiz_err[:,i-1]))+" Cmp Qtisn Error: "+str(np.mean(cmp_qtiz_err[:,i-1])))
+		print("Channel Evolution: "+str(i)+" Qtisn Error: "+str(np.mean(qtiz_err[chan_inst][i-1]))+" Cmp Qtisn Error: "+str(np.mean(cmp_qtiz_err[chan_inst][i-1])))
 
 pdb.set_trace()
+
+np.save('./cmp_qtiz_U_norm5.npy',cmp_qtiz_U)
+np.save('./cmp_qtiz_err_norm5.npy',cmp_qtiz_err)
+np.save('./fin_qt_U_norm5.npy',fin_qt_U)
+np.save('./qtiz_err_norm5.npy',qtiz_err)
+np.save('./qtiz_U_norm5.npy',qtiz_U)

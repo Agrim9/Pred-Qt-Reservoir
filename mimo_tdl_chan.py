@@ -191,6 +191,34 @@ def rand_SH(n):
     return A
 
 
+def quasiGeodinterp(qtized_Us, num_subcarriers, feedback_indices):
+    recon_U=np.zeros((num_subcarriers,qtized_Us.shape[1],qtized_Us.shape[2]),dtype='complex')
+    recon_U[feedback_indices]=qtized_Us
+    separation=int((num_subcarriers-1)/(qtized_Us.shape[0]-1))
+    for i in range(qtized_Us.shape[0]-1):    
+        U_current=qtized_Us[i]
+        U_next=qtized_Us[i+1]
+        M=np.matrix(U_next)
+        S=sH_lift(U_current,M)
+        t=np.arange(1,separation)/separation
+        interpolation_fn= lambda  t:sH_retract(U_current,t*S)
+        U_interpolate=list(map(interpolation_fn, t))
+        recon_U[feedback_indices[i]+1:feedback_indices[i+1]]=U_interpolate
+    return recon_U
+
+def sigmaInterp_qtize(sigma_data,num_subcarriers,feedback_indices,sigma_cb):
+    interpS=np.zeros((num_subcarriers,sigma_data.shape[1]))
+    diff_freq=feedback_indices[1]-feedback_indices[0]
+    for i in range(feedback_indices.shape[0]-1):
+        curr_S = sigma_data[i]
+        next_S = sigma_data[i+1]
+        qcurr_S=sigma_cb[np.argmin([la.norm(curr_S-codeword) for codeword in sigma_cb])]
+        qnext_S=sigma_cb[np.argmin([la.norm(next_S-codeword) for codeword in sigma_cb])]
+        interpS[feedback_indices[i]:feedback_indices[i+1]]=[(1-(t/diff_freq))*qcurr_S+(t/diff_freq)*qnext_S\
+            for t in range(0,diff_freq)]
+    interpS[feedback_indices[feedback_indices.shape[0]-1]]=qnext_S
+    return interpS
+
 def find_precoder_list(H_list,ret_full=False):
     V_list = []
     U_list = []
@@ -275,16 +303,6 @@ def Geodesic_interpolation(self, U_current, U_next, num_indices_to_be_filled, Nr
         U_interpolate.append(U_next[:,np.arange(Nr)])
     return np.array(U_interpolate)
 
-def quasiGeodesic_interpolation(self, U_current, U_next, num_indices_to_be_filled, last_fill_flag=False):
-    # orientation_matrix=self.find_orientation_matrix(U_current, U_next)
-    M=np.matrix(U_next)
-    S=sH_lift(U_current,M)
-    t=np.linspace(0,1,num=num_indices_to_be_filled+1, endpoint=False)
-    interpolation_fn= lambda  t:sH_retract(U_current,t*S)
-    U_interpolate=list(map(interpolation_fn, t))
-    if(last_fill_flag):
-        U_interpolate.append(U_next)
-    return np.array(U_interpolate)
 
 def orthLifting_interpolation(self, U_current, U_next, num_indices_to_be_filled, last_fill_flag=False):
     orientation_matrix=self.find_orientation_matrix(U_current, U_next)
