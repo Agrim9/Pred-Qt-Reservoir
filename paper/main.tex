@@ -1,137 +1,216 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%2345678901234567890123456789012345678901234567890123456789012345678901234567890
-%        1         2         3         4         5         6         7         8
+%% This is a skeleton file demonstrating the use of IEEEtran.cls (requires IEEEtran.cls version 1.8a or later) with an IEEE conference paper.
+%%
+%% Modified by Khan Reaz( kahn.reaz@ieee.org)
+%% Support sites:
+%% http://www.ieee.org/
 
-\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
-                                                          % if you need a4paper
-%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
-                                                          % paper
+%%***********************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or implied; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE! 
+%% User assumes all risk and can modify as s/he wants.
 
-\IEEEoverridecommandlockouts                              % This command is only
-                                                          % needed if you want to
-                                                          % use the \thanks command
-\overrideIEEEmargins
-% See the \addtolength command later in the file to balance the column lengths
-% on the last page of the document
+%%***********************************************************
 
-\usepackage{romannum}
-\usepackage{amsmath}
-\usepackage{amssymb}
+\def\b0{{\bf 0}}
+\def\ba{{\bf a}}
+\def\bb{{\bf b}}
+\def\bc{{\bf c}}
+\def\bd{{\bf d}}
+\def\be{{\bf e}}
+\def\bg{{\bf g}}
+\def\bh{{\bf h}}
+\def\bi{{\bf i}}
+\def\bj{{\bf j}}
+\def\bk{{\bf k}}
+\def\bl{{\bf l}}
+\def\bm{{\bf m}}
+\def\bn{{\bf n}}
+\def\bo{{\bf o}}
+\def\bp{{\bf p}}
+\def\bq{{\bf q}}
+\def\br{{\bf r}}
+\def\bs{{\bf s}}
+\def\bt{{\bf t}}
+\def\bu{{\bf u}}
+\def\bv{{\bf v}}
+\def\bw{{\bf w}}
+\def\bx{{\bf x}}
+\def\by{{\bf y}}
+\def\bz{{\bf z}}
+
+
+\def\bSigma{{\bf \Sigma}}
+\def\bA{{\bf A}}
+\def\bB{{\bf B}}
+\def\bC{{\bf C}}
+\def\bD{{\bf D}}
+\def\bE{{\bf E}}
+\def\bF{{\bf F}}
+\def\bG{{\bf G}}
+\def\bH{{\bf H}}
+\def\bI{{\bf I}}
+\def\bJ{{\bf J}}
+\def\bK{{\bf K}}
+\def\bL{{\bf L}}
+\def\bM{{\bf M}}
+\def\bN{{\bf N}}
+\def\bO{{\bf O}}
+\def\bP{{\bf P}}
+\def\bQ{{\bf Q}}
+\def\bR{{\bf R}}
+\def\bS{{\bf S}}
+\def\bT{{\bf T}}
+\def\bU{{\bf U}}
+\def\bV{{\bf V}}
+\def\bW{{\bf W}}
+\def\bX{{\bf X}}
+\def\bY{{\bf Y}}
+\def\bZ{{\bf Z}}
+
+
+%package list
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\let\labelindent\relax
+\usepackage{enumitem}
+\usepackage{fleqn}
+\usepackage{cite}
 \usepackage{graphicx}
-\graphicspath{ {./images/} }
-\usepackage{subfig}
-\usepackage{listings}
-\usepackage{textcomp}
-\usepackage{gensymb}
-\usepackage{mathtools}
-\usepackage[skipbelow=\topskip,skipabove=\topskip]{mdframed}
-\usepackage{multirow}
-\setlength{\parskip}{0em}
-\usepackage{array}
-\usepackage[font=small]{caption}
-\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage[varg]{newtxmath}
+\graphicspath{ {images/} }
+\usepackage{pdfpages}	
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{lettrine}
+\usepackage{amsmath}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{float}
+\usepackage[font={footnotesize}]{caption}
+\usepackage[numbers,sort,square,compress]{natbib}
+\usepackage[para]{footmisc}
+% \usepackage{parskip}
+% \setlength{\parskip}{0.02\baselineskip}
 
-% The following packages can be found on http:\\www.ctan.org
-%\usepackage{graphics} % for pdf, bitmapped graphics files
-%\usepackage{epsfig} % for postscript graphics files
-%\usepackage{mathptmx} % assumes new font selection scheme installed
-%\usepackage{times} % assumes new font selection scheme installed
-%\usepackage{amsmath} % assumes amsmath package installed
-%\usepackage{amssymb}  % assumes amsmath package installed
+% \fancypagestyle{plain}{
+%   \fancyhf{} % sets both header and footer to nothing
+% \renewcommand{\headrulewidth}{0pt}
+%   \fancyhead[C]{2018 International Conference on Indoor Positioning and Indoor Navigation (IPIN), 24-27 September 2018, Nantes, France}% Right header
 
-\makeatletter
-\let\NAT@parse\undefined
-\makeatother
-\usepackage{hyperref}
-% \hypersetup{citecolor=green}
+% }
+\pagestyle{plain}% Set page style to plain.
 
-\title{\LARGE \bf
-Title
-}
-
-
-\author{Agrim Gupta, Pranav Sankhe \\ Kumar Appaiah$^{*}$ \\
-Indian Institute of Technology, Bombay, India \\
-$\{ \text{pranav\_sankhe}\}$@iitb.ac.in \\
-akumar@ee.iitb.ac.in \hspace{1cm}
-% <-this % stops a space
-\thanks{$^{*}$Prof. Kumar Appaiah is a Faculty in Department of Electrical Engineering, IIT Bombay}% <-this % stops a space
-}
-
+% \pagestyle{fancyplain}
+% \fancyhf{}
+% \renewcommand{\headrulewidth}{0pt}
+% \fancyhead[C]{2018 International Conference on Indoor Positioning and Indoor Navigation (IPIN), 24-27 September 2018, Nantes, France}
+\DeclareMathOperator*{\argmin}{argmin}
 \begin{document}
-\captionsetup[figure]{labelfont={bf}, labelformat={simple}, labelsep=colon, name={Figure}}
+%Here goes the title
+
+\title{Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework}
+
+
+%Authors List
+
+ \author{\authorblockN{Agrim Gupta\authorrefmark{1}, Pranav Sankhe\authorrefmark{1}, Kumar Appaiah\authorrefmark{1}, Manoj Gopalkrishnan\authorrefmark{1}}
+ \
+ \authorblockA{\authorrefmark{1}Department of Electrical Engineering, Indian Institute of Technology Bombay\\
+ \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in}
+% \thanks{Parts of this work was supported by the Bharti Centre for Communication in
+% IIT Bombay, and the Visvesvaraya
+% PhD Scheme of Ministry of Electronics \& Information Technology,
+% Government of India (implemented by the Digital India Corporation).
+% }}
+}
 \maketitle
-\thispagestyle{empty}
-\pagestyle{empty}
 
+\thispagestyle{plain}
+%Main body starts
+
+
+
+  % \noindent We consider problem of quantization and interpolation of
+  % time and frequency varying precoding matrices in wireless MIMO
+  % systems. Knowledge of precoder matrices at the transmitter can We first establish a result comparing the performance of
+  % quantization and interpolation attempted directly over the Stiefel
+  % manifold rather than over the Unitary manifold, as has been the
+  % primary approach thus far. We propose a predictive quantization
+  % algorithm to improve upon the quantization metric by exploiting both
+  % time and frequency correlations in a constructed frequency hopping
+  % scenario. Building upon these, we finally propose a joint
+  % time-frequency interpolating algorithm to estimate the precoders
+  % which were not fed back. We demonstrate significant improvements in
+  % both BER curve and log-sum rate capacity over the existing
+  % approaches.
 \begin{abstract}
- %We identify potential applications for this system which range from asset tracking, security, and human-computer interface, to robot navigation and the management of services as diverse as medical care and postal delivery.
+
+  % Precoding transmissions in wireless MIMO systems is essential to
+  % enable optimal utilization of the spatial degrees of
+  % freedom. However, communicating the precoding matrices from the
+  % receiver is challenging, owing to large feedback requirements. Past
+  % work has shown that predictive quantization in time, as well as
+  % interpolation over frequency can be used to reconstruct the
+  % precoders over a wide band, although these techniques have not been
+  % used jointly. We propose both a predictive quantization as well as a
+  % joint time-frequency interpolation strategy for precoding matrices
+  % over the Stiefel manifold. The key insight that we use is that
+  % local tangent spaces in the manifold permit effective combination of
+  % both temporal and frequency domain information for more accurate
+  % precoder reconstruction. Simulations reveal that we obtain a
+  % significant improvement in achievable rate as well as BER reduction
+  % when compared to existing strategies.
+
+Precoding matrices obtained via SVD\footnote{Singular Value Decomposition} of the MIMO channel matrix can be utilized at the transmitter for optimum power allocation and lower BER\footnote{Bit Error Rate} transmissions. 
+However, a key step enabling this improved performance is the feedback of these precoders to the transmitter from the receiver.
+Considering the limited bit budget for such CSI\footnote{Channel State Information} feedback, the precoders need to be quantized with single digit bits.
+For a $N_T \times N_R$\footnote{$N_T(R)$: Number of Transmit (Receive) Antennas} MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
+This odious task is helped by the presence of an underlying manifold structure, and temporal/frequency correlations in the precoders. 
+In this work, we introduce a reservoir computing framework for the task of prediction of new precoders upon observation of past such precoders, by utilizing temporal correlations. 
+This is a departure from existing methods which exploit the non linear geometry endowed by the manifold structure to perform the same.
+Alternately, the non-linear relation is captured in our work via the dynamical reservoir state via the training process of the reservoir. 
+Simulations reveal reduced quantization error, which results in lower BER as well as improved achievable rate, as compared to previous work.
 
 
-\textit{Index Terms} - Indoor Localization; WiFi; Received Signal Strength Indicator (RSSI); Long Short-Term Memory Network (LSTM).
 
-% We identify potential applications for this system which range from asset tracking, security, and human-computer interface, to robot navigation and the management of services as diverse as medical care and postal delivery.
 \end{abstract}
 
 
-\section{INTRODUCTION}
+
+\section{Introduction}
+\label{intro}
+
+% 
+
+\section{System Model}
+\label{section2}
 
 
-
-\section{LITERATURE REVIEW}
-
-
-
-\section{APPROACH}
-
-\subsection{System Design}
+\section{Reservoir model for Predictive Quantization}
+\label{section3}
 
 
-\subsection{Machine Learning Architecture}
+\section{Simulation Results}
+\label{section4}
 
 
-\subsection{Results}
-\section{Conclusion and Future Work}
+\section{Conclusions}
+\label {section5}
 
-\section{Acknowledgements}
 
-% \begin{table}[h]
-% \caption{Testing Results}
-% \label{table_example}
-% \begin{center}
-% \begin{tabular}{|c||c|}
-% \hline
-% Dataset 1 & Two\\
-% \hline
-% Dataset 2 & Two\\
-% \hline
-% Dataset 3 & Four\\
-% \hline
-% Dataset 4 & Four\\
-% \end{tabular}
-% \end{center}
-% \end{table}
+% \section{Acknowledgment}
+% % \label {section6}
+% % \input{sections/6_section.tex}
+% Parts of this work was supported by the Bharti Centre for Communication in
+% IIT Bombay, and the Visvesvaraya
+% PhD Scheme of Ministry of Electronics \& Information Technology,
+% Government of India, being implemented by Digital India Corporation.
 
-\addtolength{\textheight}{-10cm}   % This command serves to balance the column lengths
-                                  % on the last page of the document manually. It shortens
-                                  % the textheight of the last page by a suitable amount.
-                                  % This command does not take effect until the next page
-                                  % so it should come on the page before the last. Make
-                                  % sure that you do not shorten the textheight too much.
 
-% \section*{APPENDIX}
-% \subsection{User Datagram Protocol}
-% User Datagram Protocol is an alternative communication protocol to Transmission Control Protocol(TCP).  Both layers are on top of Internet Protocol layer. TCP sends individual packets and is reliable whereas UDP sends messages called datagrams. TCP is more dominant protocol in today’s internet world because of its ability to break datasets into packets, check for and resend lost packets, and reassemble packets in the correct sequence. But these lead to additional data overhead and latency whereas in UDP packets can take different paths between sender and receiver resulting in some packets getting lost or received out of order. Following are some applications and features of this Protocol: 
-% \begin{enumerate}
-% \item Advantageous in applications that can tolerate losing of data
-% \item Allows data to be dropped or received out of order making it suitable for real-time applications such as gaming, video conferences etc.
-% \end{enumerate}
-
-\newpage
-\begin{thebibliography}{99}
-
-\bibitem{c1} S. Sadowski and P. Spachos, "RSSI-Based Indoor Localization With the Internet of Things," in IEEE Access, vol. 6, pp. 30149-30161, 2018.
-
-\end{thebibliography}
-
+\renewcommand{\bibfont}{\footnotesize}
+\bibliography{IEEEabrv,main}
+\bibliographystyle{IEEEtran}
 \end{document}
+
+% Remove the first para of FSM. State what r1,r2,d,\theta are in the FSM model states themselves. As a concluding statement of STAT-2 state that using the 
+% inherit geometery of the problem, we get AoA

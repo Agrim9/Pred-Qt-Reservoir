@@ -1,0 +1,11 @@
+image: debian:stable
+
+build:
+  stage: build
+  before_script:
+    - apt update && apt -y install texlive-latex-recommended texlive-fonts-extra texlive-publishers make inkscape
+  script:
+    - make -B
+  artifacts:
+    paths:
+      - main.pdf

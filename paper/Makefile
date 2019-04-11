@@ -1,15 +1,24 @@
+#all: main.pdf
 all: main.pdf
 
-main.pdf: main.tex
-	pdflatex -shell-escape main.tex
+MAINFILES := main.tex $(shell find sections -iname '*tex')
+
+IMAGEFILES := $(shell find -iname '*svg')
+
+IMAGEPDFS := $(IMAGEFILES:%.svg=%.pdf)
+
+main.pdf: main.bib $(MAINFILES) $(IMAGEPDFS)
+	pdflatex main.tex && bibtex main && pdflatex main && pdflatex main
+
+%.pdf: %.svg
+	inkscape --export-pdf=$@ $<
+
 
 .PHONY: clean
 clean:
-	$(RM) main.pdf \
-main.aux \
+	$(RM) $(IMAGEPDFS) main.aux \
 main.bbl \
 main.blg \
 main.log \
 main.out \
-main.pdf \
-main.tex~
+main.pdf

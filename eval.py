@@ -12,10 +12,11 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
-U_data=np.load("./BER_calc1/ped_10_100_4_2.npy")
-qt_U_data=np.load("./BER_calc1/qt_ped_10_100_4_2.npy")
-H_data=np.load("./BER_calc1/ped_10_100_4_2_H.npy")
-sigma_data=np.load("./BER_calc1/ped_10_100_4_2_sigma.npy")
+norm=1
+U_data=np.load("./BER_Data/ped_10_100_4_2.npy")
+qt_U_data=np.load("./BER_Data/qt_ped_10_100_4_2.npy")
+H_data=np.load("./BER_Data/ped_10_100_4_2_H.npy")
+sigma_data=np.load("./BER_Data/ped_10_100_4_2_sigma.npy")
 num_chans=10
 num_evols=100
 Nt=4
@@ -36,21 +37,22 @@ unqtBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 indqtBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 count=0
 sil_BER=0
+sil_cap=1
 # qtiz_U=np.load('./Intmd_Res/qtiz_U0.npy')
 # cmp_qtiz_U=np.load('./Intmd_Res/cmp_qtiz_U0.npy')
 # cmp_qtiz_err=np.load('./Intmd_Res/cmp_qtiz_err0.npy')
 # qtiz_err=np.load('./Intmd_Res/qtiz_err0.npy')
 # fin_qt_U=np.load('./Intmd_Res/fin_qt_U0.npy')
-qtiz_U=np.load('./BER_calc1/qtiz_U.npy')
-cmp_qtiz_U=np.load('./BER_calc1/cmp_qtiz_U.npy')
-cmp_qtiz_err=np.load('./BER_calc1/cmp_qtiz_err.npy')
-qtiz_err=np.load('./BER_calc1/qtiz_err.npy')
-fin_qt_U=np.load('./BER_calc1/fin_qt_U.npy')
-# sigma_cb=np.load('./Codebooks/Independent_qt/sigma_cb_2bits_10000.npy')
+qtiz_U=np.load('./BER_Data/qtiz_U.npy')
+cmp_qtiz_U=np.load('./BER_Data/cmp_qtiz_U.npy')
+cmp_qtiz_err=np.load('./BER_Data/cmp_qtiz_err.npy')
+qtiz_err=np.load('./BER_Data/qtiz_err0.npy')
+fin_qt_U=np.load('./BER_Data/fin_qt_U.npy')
+sigma_cb=np.load('./Codebooks/Independent_qt/sigma_cb_2bits_10000.npy')
 num_Cappar=7
 avg_rescap=np.zeros(num_Cappar)
 avg_otcap=np.zeros(num_Cappar)
-# avg_maxcap=np.zeros(num_Cappar)
+avg_maxcap=np.zeros(num_Cappar)
 
 for chan_inst in range(num_chans):
 	print("--------------------------------------------------")
@@ -58,26 +60,37 @@ for chan_inst in range(num_chans):
 	print("--------------------------------------------------")
 	for i in range(1,num_evols):
 		print("Channel Evolution: "+str(i)+" Qtisn Error: "+str(np.mean(qtiz_err[chan_inst][i-1]))+" Cmp Qtisn Error: "+str(np.mean(cmp_qtiz_err[chan_inst][i-1])))
-		# reservoir_reconstructed_Us=quasiGeodinterp(qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
-		# time_reconstructed_Us=quasiGeodinterp(cmp_qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
-		unqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
-		# indqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(qt_U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
+		reservoir_reconstructed_Us=quasiGeodinterp(qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
+		time_reconstructed_Us=quasiGeodinterp(cmp_qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
+		
+		# unqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
+		indqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(qt_U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
 		# reconstructed_sigmas=sigmaInterp_qtize(sigma_data[chan_inst][i][feedback_indices],num_subcarriers,feedback_indices,sigma_cb)
 		# pdb.set_trace()
-		# ot_cap=[np.mean(leakage_analysis(H_data[chan_inst][i],[vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],\
-		#     time_reconstructed_Us,num_subcarriers,\
-		#     waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
-		#     waterfilling(reconstructed_sigmas.flatten(),10**(0.1*p_dB)*num_subcarriers),\
-		#     Nt,Nr,ret_abs=True)) for p_dB in 5*np.arange(num_Cappar)]
-		# res_cap=[np.mean(leakage_analysis(H_data[chan_inst][i],[vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],\
-		#     reservoir_reconstructed_Us,num_subcarriers,\
-		#     waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
-		#     waterfilling(reconstructed_sigmas.flatten(),10**(0.1*p_dB)*num_subcarriers),\
-		#     Nt,Nr,ret_abs=True)) for p_dB in 5*np.arange(num_Cappar)]
-		# avg_otcap=(count*avg_otcap+np.array(ot_cap))/(count+1)
-		# avg_rescap=(count*avg_rescap+np.array(res_cap))/(count+1)
-		# print("Avg. Onlyt Capacity " +str(repr(avg_otcap)))
-		# print("Avg. Res Hopping Capacity "+str(repr(avg_rescap)))
+		if(sil_cap==0):
+			reconstructed_sigmas=sigmaInterp_qtize(sigma_data[chan_inst][i][feedback_indices],num_subcarriers,feedback_indices,sigma_cb)
+			ot_cap=[np.mean(leakage_analysis(H_data[chan_inst][i],[vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],\
+			    time_reconstructed_Us,num_subcarriers,\
+			    waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    waterfilling(reconstructed_sigmas.flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    Nt,Nr,ret_abs=True)) for p_dB in 5*np.arange(num_Cappar)]
+			res_cap=[np.mean(leakage_analysis(H_data[chan_inst][i],[vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],\
+			    reservoir_reconstructed_Us,num_subcarriers,\
+			    waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    waterfilling(reconstructed_sigmas.flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    Nt,Nr,ret_abs=True)) for p_dB in 5*np.arange(num_Cappar)]
+			max_cap=[np.mean(leakage_analysis(H_data[chan_inst][i],[vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],\
+			    [vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)],num_subcarriers,\
+			    waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    waterfilling(sigma_data[chan_inst][i].flatten(),10**(0.1*p_dB)*num_subcarriers),\
+			    Nt,Nr,ret_abs=True)) for p_dB in 5*np.arange(num_Cappar)]
+			avg_otcap=(count*avg_otcap+np.array(ot_cap))/(count+1)
+			avg_rescap=(count*avg_rescap+np.array(res_cap))/(count+1)
+			avg_maxcap=(count*avg_maxcap+np.array(max_cap))/(count+1)
+			print("Avg. Onlyt Capacity " +str(repr(avg_otcap)))
+			print("Avg. Res Capacity "+str(repr(avg_rescap)))
+			print("Avg. Max Capacity "+str(repr(avg_maxcap)))
+
 		# ----------------------------------------------------------------------
 		# BER tests
 		if(sil_BER==0):
@@ -88,16 +101,16 @@ for chan_inst in range(num_chans):
 		    for i in range(Eb_N0_dB.shape[0]):
 		        # BER_onlyt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),time_reconstructed_Us,Eb_N0_dB[i])
 		        # BER_res_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),reservoir_reconstructed_Us,Eb_N0_dB[i])
-			    BER_unqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),unqt_reconstructed_Us,Eb_N0_dB[i])
-			    # BER_indqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),indqt_reconstructed_Us,Eb_N0_dB[i])
+			    # BER_unqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),unqt_reconstructed_Us,Eb_N0_dB[i])
+			    BER_indqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),indqt_reconstructed_Us,Eb_N0_dB[i])
 		    # resBER_QPSK=(count*resBER_QPSK+BER_res_QPSK)/(count+1)
 		    # otBER_QPSK=(count*otBER_QPSK+BER_onlyt_QPSK)/(count+1)
-		    unqtBER_QPSK=(count*unqtBER_QPSK+BER_unqt_QPSK)/(count+1)
-		    # indqtBER_QPSK=(count*indqtBER_QPSK+BER_indqt_QPSK)/(count+1)
+		    # unqtBER_QPSK=(count*unqtBER_QPSK+BER_unqt_QPSK)/(count+1)
+		    indqtBER_QPSK=(count*indqtBER_QPSK+BER_indqt_QPSK)/(count+1)
 		    # print("ot_ber = np."+str(repr(otBER_QPSK)))
 		    # print("res_ber = np."+str(repr(resBER_QPSK)))
-		    print("unqt_ber = np."+str(repr(unqtBER_QPSK)))
-		    # print("indqt_ber = np."+str(repr(indqtBER_QPSK)))
+		    # print("unqt_ber = np."+str(repr(unqtBER_QPSK)))
+		    print("indqt_ber = np."+str(repr(indqtBER_QPSK)))
 			
 		count=count+1
 
