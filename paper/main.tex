@@ -269,16 +269,133 @@ The proposed reservoir computing scheme is evaluated against the temporal predic
 \section{Reservoir model for Predictive Quantization}
 \label{section3}
 \subsection{Vectorizing matrices in Stiefel Manifold}
+The reservoir computing framework has inputs/outputs as vectors, and hence it is necessary to convert the precoder matrices to vectors. 
+A precoding matrix $\mathcal{\bM} \in \text{St}(N_T,N_R)$ is a $N_T\times N_R$ matrix with the property $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$. 
+For brevity sake, let us say that such a matrix $\mathcal{\bM}$ is a \'semi-unitary\' matrix.
+A naive method of vectorizing a $N_T\times N_R$ semi-unitary matrix would be to take all it's $N_TN_R$ complex numbers individually and stack them onto a $2N_TN_R$ dimensional vector.
+However, we can do this a little more efficiently, considering the $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$ property, which implies that each vector representing the columns of $\mathcal{\bM}$ is orthogonal to other columns.
+For the first column, we take the $N_T$ complex numbers and stack them onto a $2N_T$ vector. 
+For the second column, we take only the first $N_T-1$ complex numbers, since the last number can be determined by utilizing orthogonality with the first vector. 
+For the third column, we take only the first $N_T-2$ complex numbers, and so on. 
+Hence, we can vectorize the $N_T\times N_R$ $\mathcal{\bM}$ into a $2(N_T)+2(N_T-1)+\ldots+2(N_T-N_R+1)= 2N_TN_R-(N_R^2-N_R)$ dimensional vector. 
+For any semi-unitary matrix $\mathcal{\bM}$, denote by $\mathcal{\bm}$ the vectorized representation.
+
+Observe here that we do pay a dimensional penalty upon vectorizing the semi-unitary $\mathcal{\bM}$. 
+$\mathcal{\bM} \in \text{St}(N_T,N_R)$, which is a $2N_TN_R-N_R^2$ dimensional manifold. 
+We vectorize $\mathcal{\bM}$ to a $2N_TN_R-N_R^2+N_R$ dimensional vector, an overhead of $N_R$ dimensions, since we didn't exploit the fact that each column vector is a norm 1 vector as well.
+It looks as if we could just take $N_T-1$ complex numbers when vectorizing the first column, instead of $N_T$, but this would lead to a non-unique representation, since there could then be infinite possibilities of the missing one complex number, such that the vector has a norm 1.
 %Focus on the fact that you don't actually pay a penalty
 %The thing to quantize remains on the Stiefel Manifold
 \subsection{Prediction and Quantization}
-%Reservoir Pic
+The vector representation of semi-unitary matrices allow us to proceed with the discussion on reservoir computing framework for predictive quantization of SVD precoders. Consider the reservoir computing framework as in Fig. %Ref Fig. Reservoir Pic
+
+The input to the reservoir $i$ corresponding to subcarrier $i$, is $\tilde{\bu}_{i,t-1}$, which is the vectorized representation of $\tilde{\bU}_{i,t-1}$. 
+Let $D_{\text{in}}=2N_TN_R-N_R^2+N_R$ be the dimension of the input vector to the dimension.
+Using a randomly initialized $D_{\text{in}}\times D_{\text{resv}}$ input coupler matrix $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. 
+The reservoir state vector $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation,
+\begin{equation}
+\br_{i,t}=\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})
+\label{res_upd}
+\end{equation}
+where $\bA_i$ is the adjacency matrix which captures the reservoir dynamics and correlates reservoir state across time, and tanh is applied element wise. 
+Typical choices for $\bA_i$ have been erdos-renyi graphs with an upper bounded maximum eigen value \cite{mosleh2017brain,pathak2017using}.
+
+The output of the reservoir is $\bp_{i,t}$, a vectorized representation of $\bP_{i,t}$. 
+Hence, the output of the reservoir is also a $D_{\text{in}}$ dimensional vector ($D_{\text{out}}=D_{\text{in}}$). 
+The output $\bp_{i,t}$ is obtained via matrix transformation of the reservoir state $\br_{i,t}$ via the $D_{\text{resv}}\times D_{\text{out}}$ output coupler matrix $\bW^{\text{out}}_i$, viz.
+\begin{equation}
+\bp_{i,t}=\bW^{\text{out}}_i\br_{i,t}
+\label{pred_op}
+\end{equation}
+
+This completes the forward prediction algorithm to obtain $\bP_{i,t}$ using just one past observed $\bU_{i,t-1}$. That is,
+\begin{equation}
+\bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_i\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For Brevity sake, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
+\label{fwd_pred}
+\end{equation}
+
+However, a complete discussion of the prediction algorithm also involves a backward pass, involving the updation of output couplers $\bW^{\text{out}}_i$, which would follow next.
+
+Before proceeding ahead, it is critical to detail out the quantization function $q_P(\bP_{i,t},\text{fb}_{i,t})$. 
+The quantization method is similar to the one used in \cite{6891198,Gupt1905:Predictive,6545375}. 
+Central to the quantization algorithm is the fact that tangent spaces local to a point in manifold, are actually linear vector spaces.
+Given two points $\bX$ and $\bY$ in $\text{St}(N_T,NR)$, a lifting operation $\bT^Y_X=\texttt{lift}(\bX,\bY)$, $\texttt{lift}:\text{St}(N_T,NR)^2 \to \mathcal{T}_X \text{St}(N_T,NR)$ gives a tangent from X to Y, $\bT^Y_X \in \mathcal{T}_X \text{St}(N_T,NR)$, where $\mathcal{T}_X \text{St}(N_T,NR)$ is the local tangent space at $\bX$.
+A corresponding retraction operation $Y=\texttt{retract}(X,\bT^Y_X)$gives back the manifold point obtained by traversing in the tangent direction.
+In this work, the chosen lifting-retraction operations are the Cayley Exponentials, elaborated in \cite{DBLP:journals/corr/abs-1708-00045} and used in \cite{Gupt1905:Predictive}.
+The Cayley exponential lifting operation maps two points in $\text{St}(N_T,N_R)$, to a $N_T\times N_T$ skew hermitian matrix representing the tangent from first point to the other. 
+
+The quantization algorithm exploits the linear vector space property of the tangent space and quantizes the local tangent space at the predicted precoder $\bP_{i,t}$.
+The codebook for the local tangent space basically corresponds to a collection of codewords representing the different directions (tangents) in the local tangent space.
+This codebook is also referred to as the base codebook for the quantization function.
+The feedback from the receiver indicates the optimum direction in the base codebook, which the transmitter can choose to get closest to the actual value $\bU_{i,t}$.
+With the optimum direction chosen, the next step is to determine how much to move in that particular direction, viz. the length of the chosen tangent direction.
+For this, we adopt the strategy in \cite{6891198}, which
+controls the magnitude of tangent steps, by having two codebooks
+$T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$ of different spreads, but same
+$2^{\mathcal{B}-1}$ base vectors from the base codebook. 
+The base vectors correspond to $2^{\mathcal{B}-1}$ quantized directions, and by spread of codewords, we mean the length of base vectors considered, with $T^{\mathcal{C}}_p$ having tangents of higher length than $T^{\mathcal{C}}_m$. 
+The two codebooks are concatenated to form a $2^\mathcal{B}$ length codebook $T^\mathcal{C}$. 
+The receiver finds the optimal index $c_n$ in $T^\mathcal{C}$ by comparing the chordal distance metric ($d_s$) of Stiefel Manifold \cite{Gupt1905:Predictive,6891198}, of each codeword to the actual precoder $\bU_{i,t}$ obtained from the SVD of the channel matrix, using \eqref{eqn:cn1}. The receiver then feeds back $c_n$ to the transmitter using $\mathcal{B}$ bits. The transmitter uses the fed back $c_n$ and \eqref{eqn:cn2} to calculate $\tilde{\bU}_{i,t}$,
+\begin{equation}
+\label{eqn:cn1}
+c_n \gets \text{argmin}_{i \in 2^\mathcal{B}}\left (d_s\left (\bU_{k,l},\text{retract}(\bP_{k,l},T^\mathcal{C}[i])\right ) \right)
+\end{equation}
+\begin{equation}
+\tilde{\bU}_{k,l}=\text{retract}(\bP_{k,l},T^\mathcal{C}[c_n])
+\label{eqn:cn2}
+\end{equation}
+
+
+% \textcolor{blue}
+{We now describe the algorithm used to control the spread of the codebooks, as discussed in \cite{6891198}. The base codebook ($\mathcal{T}^B$) consists of
+  $2^{\mathcal{B}-1}$ matrices belonging to the local tangent space at
+  $\bP_{k,l}$, which represent the $2^{\mathcal{B}-1}$ quantized directions. The two codebooks,
+  $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$, have the same set of base
+  vectors, but different spreads $g^{s_p}$ and $g^{s_m}$, where $g$ is
+  the growth factor and $s_p,s_m$ control the spread of the two
+  codebooks. Depending on whether $c_n \geq 2^{\mathcal{B}-1}$,
+  i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or
+  $T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn
+  controls values of $s_p, s_m$ is updated in the following manner,
+$$s_p=g^{\text{min}(s[k-1]+1,0)}, s_m = g^{s[k-1]-1}$$
+$$
+s[k]=
+\begin{cases}
+\text{min}(s[k-1]+1,0), \text{ for }c_n \in T^{\mathcal{C}}_p\\
+s[k-1]-1, \text{otherwise}\\
+\end{cases}
+$$
+with $s[0]=0$. Intuitively, the algorithm reduces/increases the spread
+of the codebook till the operation of reduction/increase is no longer
+beneficial, i.e. the optimum codeword lies in the higher/lower spread
+codebook instead. The scheme we use for obtaining the quantized
+directions, however, differs slightly from the one presented in
+\cite{6891198}. As discussed in Section \ref{section3}, the Cayley
+type lifting map takes inputs from the Stiefel manifold and maps them
+to $N_T \times N_T$ skew Hermitian matrices. This allows for vector
+quantization of the tangent space, since a skew Hermitian matrix can
+be easily converted to a vector, by taking the upper triangular
+entries and stacking them in a vector. Vector quantization for the
+base codebook, $\mathcal{T}^B$ allows for isotropic $2^{\mathcal{B}-1}$ quantized
+directions for the tangent space local to $\bP_{k,l}$. \cite{6891198}
+proposed a randomly initialized $\mathcal{T}^B$ which does not guarantee
+isotropic $2^{\mathcal{B}-1}$ quantized directions, which can
+potentially hurt the performance of the system in the cases when
+random initialization gives directions which are close to each
+other. More details on codebook construction are provided in Section
+\ref{section5}. This concludes the proposed predictive quantization
+algorithm.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% More information needed about the adjacency
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \section{Simulation Results}
 \label{section4}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
 %BER
-%Achievable rate
+%Achievable rat
 \section{Conclusions and Future Work}
 \label{section5}
 
