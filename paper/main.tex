@@ -113,9 +113,9 @@
 
 %Authors List
 
- \author{\authorblockN{Agrim Gupta\authorrefmark{1}, Pranav Sankhe\authorrefmark{1}, Kumar Appaiah\authorrefmark{1}, Manoj Gopalkrishnan\authorrefmark{1}}
+ \author{\authorblockN{Agrim Gupta, Pranav Sankhe, Kumar Appaiah, Manoj Gopalkrishnan}
  \
- \authorblockA{\authorrefmark{1}Department of Electrical Engineering, Indian Institute of Technology Bombay\\
+ \authorblockA{Department of Electrical Engineering, Indian Institute of Technology Bombay\\
  \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in}
 % \thanks{Parts of this work was supported by the Bharti Centre for Communication in
 % IIT Bombay, and the Visvesvaraya
@@ -163,7 +163,7 @@
 
 Precoding matrices obtained via SVD\footnote{Singular Value Decomposition} of the MIMO channel matrix can be utilized at the transmitter for optimum power allocation and lower BER\footnote{Bit Error Rate} transmissions. 
 However, a key step enabling this improved performance is the feedback of these precoders to the transmitter from the receiver.
-Considering the limited bit budget for such CSI\footnote{Channel State Information} feedback, the precoders need to be quantized with single digit bits.
+Considering the limited bit budget for such CSI\footnote{Channel State Information} feedback, the precoders need to be quantized with single digit number of bits.
 For a $N_T \times N_R$\footnote{$N_T(R)$: Number of Transmit (Receive) Antennas} MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
 This odious task is helped by the presence of an underlying manifold structure, and temporal/frequency correlations in the precoders. 
 In this work, we introduce a reservoir computing framework for the task of prediction of new precoders upon observation of past such precoders, by utilizing temporal correlations. 
@@ -179,23 +179,108 @@ Simulations reveal reduced quantization error, which results in lower BER as wel
 
 \section{Introduction}
 \label{intro}
+% Broad summary of your work, come to your problem definition. 
+In MIMO wireless systems, precoding matrices are used for matrix transformation of $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto the $N_T$-dimensional transmit vector, corresponding to the signal emanating out of the $N_T$ antennas of the transmitter.
+The optimum precoding matrix, to achieve channel capacity via optimum power allocation is obtained via the SVD of the MIMO channel matrix. \cite{love2008overview}
+The MIMO channel matrix is estimated at the receiver, and the transmitter has no a-priori knowledge of the same.
+Hence, to avail the said benefits of SVD precoders, the receiver needs to quantize and feedback the precoders it obtains from SVD of the MIMO channel matrix.
+To respect the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed only with a few single number of bits.
+Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits pose a significant challenge.
+
+% Elaborate on each point (what people have done before) lecunnas
+This challenge has been overcome in past work via two inherent properties of the precoders. 
+Firstly, the precoders are not actually $2\times N_T\times N_R$ dimensional entities, and these actually have an underlying manifold structure which allows one to work with lower dimensions if one performs operations over the manifold directly.
+Secondly, these precoders are correlated nicely along both time and frequency. 
+Capturing temporal correlations allow for predictive quantization algorithms, which allow improvement of the quantization error with time.
+Exploiting frequency correlations allow for various interpolation algorithms, which in turn reduce the feedback overhead in a single OFDM frame, by feeding back only for certain subcarriers, and interpolating over the others.
+Although the underlying manifold structure allows one to work with effective lower dimensions, most of the naive linear algorithms to predict and interpolate don't work well here, owing to the inherent non-linear structure of the manifold.
+Hence, combining these two properties, viz. the underlying manifold structure and temporal-frequency correlations, require generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
+
+% What is the way ahead
+The manifold based approaches have provided significant performance benefits, given that they work with effective lower dimensions.
+However, these approaches are difficult to implement and require some familiarity with manifold geometry for a complete grasp.
+In this paper, we propose a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
+The proposed scheme offers a cleaner solution to the predictive quantization problem, which brings about both ease of implementability, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization.
+
+% How to we do this 
+Reservoir computing is a computational framework designed for sequential data processing. 
+It's design takes inspiration from several frameworks of recurrent neural networks \cite{jaeger2004harnessing} including Liquid State Machines \cite{jalalvand2015real}. 
+A reservoir computing system maps the inputs to spatio-temporal patterns in higher dimensional dynamical reservoir state. 
+The pattern analysis over these spatio-temporal patterns is performed by an output coupler which maps the higher dimensional reservoir state back to the output dimension, generally having lower dimensionality than reservoir state. 
+% A important characteristic of reservoir computing is that while training, the input weights and the weights within the reservoir are not kept fixed and the weights of the output coupler are updated. 
+The major advantage of reservoir computing system is that it’s extremely easy to train in comparison to its counterparts like Deep Neural Networks. 
+The input features can be efficiently read out by a simple learning algorithm because the reservoir non-linearly transforms sequential inputs into the higher dimensional reservoir state. 
+Reservoir computing has been successfully used to solve problems like spoken digit recognition \cite{verstraeten2005isolated}, handwritten digit image recognition \cite{jalalvand2015real} and climate prediction \cite{pathak2017using}.  
+% Owing to the versatility of reservoir computing, it can deal with any sequential data in principle and hence further expansion of its application fields is widely expected.
+
+Reservoir computing has also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}. 
+\cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities in order for smarter channel equalization.
+\cite{mosleh2017brain,shafin2018realizing} utilized the same for OFDM symbol detection while tapping in channel, as well as power amplifier non-linearities.
+In our work, we utilize the reservoir computing framework to discover the underlying non-linear relations between previously observed precoding matrices, in order to predict the next precoder in series. Upon vectorizing the precoding matrices, this becomes analogous to time series prediction algorithms, which the reservoir computing framework has been known to work really well for \cite{mosleh2017brain}.
 
 % 
 
 \section{System Model}
 \label{section2}
+\noindent We consider a point-to-point MIMO-OFDM wireless system that
+has $N_T$ transmit antennas and $N_R$ receive antennas. 
+The available bandwidth is divided into $N$ subcarriers, so that individually for each subcarrier, the channel can be considered flat fading. 
+The transmitter communicates an $N_s \times 1$ information data vector, where
+$N_s \leq \text{min}(N_T,N_R)$, and the $N_T \times N_s$ precoding
+matrix maps the $N_s \times 1$ information data vector onto the $N_T \times 1$ transmit vector emanating out of the transmitter.
+
+In this discussion, we assume that $N_T > N_R$ and $N_s = N_R$. Keeping notations consistent with \cite{6891198,Gupt1905:Predictive}, the $N_R \times 1$ data stream received is denoted by:
+\begin{equation}
+\by_{i,t}=\bH^{H}_{i,t}\tilde{\bU}_{i,t}\bx_{i,t}+ \bw_{i,t}
+\end{equation}
+Here $\tilde{\bU}_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the precoding matrix which is a function of quantized CSI fed back by the receiver, $\by_{i,t} \in \mathbb{C}^{N_R \times 1}$ is the received data stream, $\bx_{i,t} \in \mathbb{C}^{N_R \times 1}$ denotes the transmitted signal, all at the $i$-th subcarrier of the $t$-th OFDM frame, $\bH_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the MIMO channel matrix and $\bw_{i,t}$ denotes the i.i.d. complex Gaussian noise with $\bw_{i,t} \sim \mathcal{N}_{\mathbb{C}}(0,N_0\bI_{N_R})$, $N_0$ being the noise variance.
+
+% Tell that if infinite bit budget available, transmitter can directly use matrices obtained from SVD as precoders. However, since this is not the case we have to quantize (N dimensional) manifold, incurring substantial quantization error. Independent quantization techniques (references). Predictive quantization techniques can be used on the top of independently initialized values to improve the error. This is done in a way intuitively similar to Delta PCM, in which quantization error is reduced substanitally by using a linear predictor and quantizing the difference between the predicted and observed value. Since these preocders lie on Stiefel manifold, linear schemes will not work, due to non linearity of the manifold. However,past work has generalized the ideas to the manifold by exploiting the differential geometry of the manifold. Once a prediction is obtained, one has to quantize only the difference between the prediction and the observed value, which allows for improved quantization error. As the prediction becomes closer to the original value, the quantization error also decreases. The quantization algorithm is illustrated in Section 3.3   
 
 
+Provided an infinite bit budget for quantization, the transmitter can directly use the matrices obtained from SVD of $\bH^{H}_{i,t}$ as precoder $\tilde{\bU}_{i,t}$.
+In particular, if $\text{SVD}(\bH_{i,t}) = \bU_{i,t},\Sigma_{i,t}, \bV_{i,t}$, then $\tilde{\bU}_{i,t} = \bU_{i,t}$.
+Notice that matrices $\bU_{i,t}$ reside on the Stiefel manifold $\text{St}(N_T,N_R)$, since the columns of $\bU_{i,t}$ form a set of $N_R$ orthogonal vectors in $N_T$ dimensions \cite{Gupt1905:Predictive,6891198}.  Given practical limitations, only limited feedback is available from the receiver, and the objective is to find a `reasonable' estimate of $\bU_{i,t}$, given by $\tilde{\bU}_{i,t}$ using the available feedback bits.
+
+Algorithms similar to Lloyd codebook algorithm have been studied for quantizing $\text{St}(N_T,N_R)$ \cite{6678348}.
+However, this method treats precoders close-by in time/frequency to each other as independent, since it doesn't exploit any temporal/spectral correlations for quantization. 
+Predictive quantization algorithms \cite{Gupt1905:Predictive,6891198} can be utilized to reduce the quantization error with time by tapping in available correlations.
+
+We now discuss the basic mathematical model central to predictive quantization algorithms for precoding matrices.
+Consider that we predict based on past $p$ observed precoding matrices, and hence $\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1}$ have been fed back and available at the transmitter.
+Using a prediction algorithm and exploiting time correlations among precoders at $t-p,t-p+1,\ldots,t-2,t-1$ time instances, the transmitter can predict $\tilde{\bU}_{i,t}$ to be some $\bP_{i,t}=f_P(\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1})$, where $f_P: \text{St}(N_T,N_R)^p \to \text{St}(N_T,N_R)$ is a prediction function.
+Now since the transmitter already knows a coarse estimate of $\tilde{\bU}_{i,t}$ given by $\bP_{i,t}$, the receiver just quantizes the local space of $\text{St}(N_T,N_R)$ nearby $\bP_{i,t}$ to enable a refined estimate of $\tilde{\bU}_{i,t}$ at the transmitter.
+That is, the transmitter utilizes a quantization function $q_P:\text{St}(N_T,N_R) \times \mathbb{N} \to \text{St}(N_T,N_R)$, to obtain $\tilde{\bU}_{i,t} \gets q_P(\bP_{i,t},\text{fb}_{i,t})$, where $\text{fb}_{i,t} \in \{1,2\ldots2^{\mathcal{B}}\}$ is the feedback from the receiver for precoder at $i$-th subcarrier and $t$-th time instant, considering bit budget of $\mathcal{B}$ bits. 
+In \cite{Gupt1905:Predictive,6891198,6545375}, $\text{fb}_{i,t}$ denotes the codeword index for the codebook obtained for quantizing the local tangent space at $\bP_{i,t}$.
+
+Since using predictive quantization scheme, quantization is on a smaller subspace as compared to the entire manifold in case of independent quantization, the quantization error is substantially lower as well.
+However, that being said, independent quantization algorithms are important for initialization the predictive quantization strategies.
+Observe that, predictive quantization algorithms for SVD precoders are typically the higher dimensional analogs of the well known approaches to reduce quantization error using Linear Prediction Codes and Delta PCM.  
+In both LPC and Delta PCM, quantization error is reduced substantially by using a linear predictor and quantizing the scalar difference between the predicted and observed value. 
+Analogous to this, for $\text{St}(N_T,N_R)$ quantization error is reduced by quantizing a smaller subspace around predicted value, compared to the entire manifold.
+
+In our work, we propose a reservoir computing based prediction framework, which predicts the new precoders by tapping the temporal correlations captured from past observed precoders ($f_P$). 
+We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}, however, by incorporating the $q_P$ in the prediction framework, as discussed in subsequent sections, the $f_P$ function also exploits correlations in $q_P$ (codebook locality correlations), along with temporal correlations. 
+Previous work \cite{Gupt1905:Predictive,6891198} have $f_P$ and $q_P$ independent of each other.
+The detailed discussion on reservoir computing based model for $f_P$ and $q_P$ is presented in Section \ref{section3}. 
+The proposed reservoir computing scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}. Finally, Section \ref{section5} concludes and presents future lines of work. 
+
+%Explain prediction and quantization steps here itself ! (succintly)
 \section{Reservoir model for Predictive Quantization}
 \label{section3}
-
-
+\subsection{Vectorizing matrices in Stiefel Manifold}
+%Focus on the fact that you don't actually pay a penalty
+%The thing to quantize remains on the Stiefel Manifold
+\subsection{Prediction and Quantization}
+%Reservoir Pic
 \section{Simulation Results}
 \label{section4}
-
-
-\section{Conclusions}
-\label {section5}
+%Qtisn error with 1000 chan evols
+%Qtisn error with 100 chan evols
+%BER
+%Achievable rate
+\section{Conclusions and Future Work}
+\label{section5}
 
 
 % \section{Acknowledgment}
