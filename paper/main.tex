@@ -89,6 +89,11 @@
 \usepackage[font={footnotesize}]{caption}
 \usepackage[numbers,sort,square,compress]{natbib}
 \usepackage[para]{footmisc}
+\usepackage{xcolor}
+
+\newcommand{\highlight}[1]{%
+  \colorbox{red!50}{$\displaystyle#1$}}
+
 % \usepackage{parskip}
 % \setlength{\parskip}{0.02\baselineskip}
 
@@ -286,7 +291,7 @@ We vectorize $\mathcal{\bM}$ to a $2N_TN_R-N_R^2+N_R$ dimensional vector, an ove
 It looks as if we could just take $N_T-1$ complex numbers when vectorizing the first column, instead of $N_T$, but this would lead to a non-unique representation, since there could then be infinite possibilities of the missing one complex number, such that the vector has a norm 1.
 %Focus on the fact that you don't actually pay a penalty
 %The thing to quantize remains on the Stiefel Manifold
-\subsection{Prediction and Quantization}
+\subsection{Forward Prediction $f_P$ function}
 The vector representation of semi-unitary matrices allow us to proceed with the discussion on reservoir computing framework for predictive quantization of SVD precoders. Consider the reservoir computing framework as in Fig. %Ref Fig. Reservoir Pic
 
 The input to the reservoir $i$ corresponding to subcarrier $i$, is $\tilde{\bu}_{i,t-1}$, which is the vectorized representation of $\tilde{\bU}_{i,t-1}$. 
@@ -302,94 +307,114 @@ Typical choices for $\bA_i$ have been erdos-renyi graphs with an upper bounded m
 
 The output of the reservoir is $\bp_{i,t}$, a vectorized representation of $\bP_{i,t}$. 
 Hence, the output of the reservoir is also a $D_{\text{in}}$ dimensional vector ($D_{\text{out}}=D_{\text{in}}$). 
-The output $\bp_{i,t}$ is obtained via matrix transformation of the reservoir state $\br_{i,t}$ via the $D_{\text{resv}}\times D_{\text{out}}$ output coupler matrix $\bW^{\text{out}}_i$, viz.
+The output $\bp_{i,t}$ is obtained via matrix transformation of the reservoir state $\br_{i,t}$ via the $D_{\text{resv}}\times D_{\text{out}}$ output coupler matrix $\bW^{\text{out}}_{i,t-1}$\footnote{Why it is $t-1$ and not $t$ would surface up in Section \ref{train}}, viz.
 \begin{equation}
-\bp_{i,t}=\bW^{\text{out}}_i\br_{i,t}
+\bp_{i,t}=\bW^{\text{out}}_{i,t-1}\br_{i,t}
 \label{pred_op}
 \end{equation}
 
 This completes the forward prediction algorithm to obtain $\bP_{i,t}$ using just one past observed $\bU_{i,t-1}$. That is,
 \begin{equation}
-\bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_i\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For Brevity sake, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
+\bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_{i,t-1}\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For Brevity sake, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
 \label{fwd_pred}
 \end{equation}
-
-However, a complete discussion of the prediction algorithm also involves a backward pass, involving the updation of output couplers $\bW^{\text{out}}_i$, which would follow next.
-
-Before proceeding ahead, it is critical to detail out the quantization function $q_P(\bP_{i,t},\text{fb}_{i,t})$. 
-The quantization method is similar to the one used in \cite{6891198,Gupt1905:Predictive,6545375}. 
+However, a complete discussion of the prediction algorithm also involves a backward pass, involving the updation of output couplers $\bW^{\text{out}}_{i,t}$, which would follow subsequently. 
+\subsection{Quantization function $q_P$}
+Before proceeding ahead, it is critical to detail out the quantization function $q_P(\bP_{i,t},\text{fb}_{i,t})$, which is similar to the one used in \cite{6891198,Gupt1905:Predictive,6545375}. 
 Central to the quantization algorithm is the fact that tangent spaces local to a point in manifold, are actually linear vector spaces.
-Given two points $\bX$ and $\bY$ in $\text{St}(N_T,NR)$, a lifting operation $\bT^Y_X=\texttt{lift}(\bX,\bY)$, $\texttt{lift}:\text{St}(N_T,NR)^2 \to \mathcal{T}_X \text{St}(N_T,NR)$ gives a tangent from X to Y, $\bT^Y_X \in \mathcal{T}_X \text{St}(N_T,NR)$, where $\mathcal{T}_X \text{St}(N_T,NR)$ is the local tangent space at $\bX$.
-A corresponding retraction operation $Y=\texttt{retract}(X,\bT^Y_X)$gives back the manifold point obtained by traversing in the tangent direction.
+Given two points $\bX$ and $\bY$ in $\text{St}(N_T,N_R)$, a lifting operation $\bT^Y_X=\texttt{lift}(\bX,\bY)$, $\texttt{lift}:\text{St}(N_T,N_R)\times \text{St}(N_T,N_R) \to \mathcal{T}_X \text{St}(N_T,N_R)$ gives a tangent from X to Y, $\bT^Y_X \in \mathcal{T}_X \text{St}(N_T,N_R)$, where $\mathcal{T}_X \text{St}(N_T,N_R)$ is the local tangent space at $\bX$.
+A corresponding retraction operation $Y=\texttt{retract}(X,\bT^Y_X)$, $\texttt{retract}: \text{St}(N_T,N_R)\times \mathcal{T}_X \text{St}(N_T,N_R) \to \text{St}(N_T,N_R)$ gives back the manifold point obtained by traversing in the tangent direction given by the second argument.
 In this work, the chosen lifting-retraction operations are the Cayley Exponentials, elaborated in \cite{DBLP:journals/corr/abs-1708-00045} and used in \cite{Gupt1905:Predictive}.
 The Cayley exponential lifting operation maps two points in $\text{St}(N_T,N_R)$, to a $N_T\times N_T$ skew hermitian matrix representing the tangent from first point to the other. 
 
-The quantization algorithm exploits the linear vector space property of the tangent space and quantizes the local tangent space at the predicted precoder $\bP_{i,t}$.
-The codebook for the local tangent space basically corresponds to a collection of codewords representing the different directions (tangents) in the local tangent space.
-This codebook is also referred to as the base codebook for the quantization function.
-The feedback from the receiver indicates the optimum direction in the base codebook, which the transmitter can choose to get closest to the actual value $\bU_{i,t}$.
+The quantization algorithm exploits the linear vector space property of the tangent space and quantizes the local tangent space at the predicted precoder $\bP_{i,t}$, viz $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$.
+The codebook for $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$ basically corresponds to a collection of codewords representing the different directions (tangents) in $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$.
+This codebook is also referred to as the base codebook ($\text{base}^{\mathcal{C}}$) for the quantization function.
+The feedback from the receiver indicates the optimum tangent in the $\text{base}^{\mathcal{C}}$, which the transmitter can choose to get closest (in terms of chordal distance metric, $d_s(\bX,\bY)$ for $\bX,\bY \in \text{St}(N_T,N_R)$ detailed in \cite{Gupt1905:Predictive,6891198}) to the actual value $\bU_{i,t}$.
 With the optimum direction chosen, the next step is to determine how much to move in that particular direction, viz. the length of the chosen tangent direction.
 For this, we adopt the strategy in \cite{6891198}, which
 controls the magnitude of tangent steps, by having two codebooks
-$T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$ of different spreads, but same
-$2^{\mathcal{B}-1}$ base vectors from the base codebook. 
-The base vectors correspond to $2^{\mathcal{B}-1}$ quantized directions, and by spread of codewords, we mean the length of base vectors considered, with $T^{\mathcal{C}}_p$ having tangents of higher length than $T^{\mathcal{C}}_m$. 
+$T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$ of different spreads $s_p,s_m$, but same $2^{\mathcal{B}-1}$ base vectors from $\text{base}^{\mathcal{C}}$, i.e. $T^{\mathcal{C}}_{\{p/m\}}=s_{\{p/m\}}\text{base}^{\mathcal{C}}$ (All codewords $\in \text{base}^{\mathcal{C}}$ multiplied by $s_{\{p/m\}}$ individually). 
 The two codebooks are concatenated to form a $2^\mathcal{B}$ length codebook $T^\mathcal{C}$. 
-The receiver finds the optimal index $c_n$ in $T^\mathcal{C}$ by comparing the chordal distance metric ($d_s$) of Stiefel Manifold \cite{Gupt1905:Predictive,6891198}, of each codeword to the actual precoder $\bU_{i,t}$ obtained from the SVD of the channel matrix, using \eqref{eqn:cn1}. The receiver then feeds back $c_n$ to the transmitter using $\mathcal{B}$ bits. The transmitter uses the fed back $c_n$ and \eqref{eqn:cn2} to calculate $\tilde{\bU}_{i,t}$,
+The receiver finds the optimal index $\text{fb}_{i,t} \in \{1,2,\ldots,2^{\mathcal{B}}\}$ in $T^\mathcal{C}$ by comparing the chordal distance metric ($d_s$), of each codeword to the actual precoder $\bU_{i,t}$ obtained from the SVD of the channel matrix, using \eqref{eqn:cn1}. The receiver then feeds back $\text{fb}_{i,t}$ to the transmitter using $\mathcal{B}$ bits. The transmitter uses the fed back $\text{fb}_{i,t}$ and \eqref{eqn:cn2} to calculate $\tilde{\bU}_{i,t}$,
 \begin{equation}
 \label{eqn:cn1}
-c_n \gets \text{argmin}_{i \in 2^\mathcal{B}}\left (d_s\left (\bU_{k,l},\text{retract}(\bP_{k,l},T^\mathcal{C}[i])\right ) \right)
+\text{fb}_{i,t} \gets \text{argmin}_{i \in \{1,2,\ldots,2^{\mathcal{B}}\}}\left (d_s\left (\bU_{i,t},\text{retract}(\bP_{i,t},T^\mathcal{C}[i])\right ) \right)
 \end{equation}
 \begin{equation}
-\tilde{\bU}_{k,l}=\text{retract}(\bP_{k,l},T^\mathcal{C}[c_n])
+\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=\text{retract}(\bP_{i,t},T^\mathcal{C}[\text{fb}_{i,t}])
 \label{eqn:cn2}
 \end{equation}
 
-
-% \textcolor{blue}
-{We now describe the algorithm used to control the spread of the codebooks, as discussed in \cite{6891198}. The base codebook ($\mathcal{T}^B$) consists of
-  $2^{\mathcal{B}-1}$ matrices belonging to the local tangent space at
-  $\bP_{k,l}$, which represent the $2^{\mathcal{B}-1}$ quantized directions. The two codebooks,
-  $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$, have the same set of base
-  vectors, but different spreads $g^{s_p}$ and $g^{s_m}$, where $g$ is
-  the growth factor and $s_p,s_m$ control the spread of the two
-  codebooks. Depending on whether $c_n \geq 2^{\mathcal{B}-1}$,
-  i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or
-  $T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn
-  controls values of $s_p, s_m$ is updated in the following manner,
+$\text{fb}_{i,t}$ is also used to update the spread of the codebooks $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$. 
+Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$,
+i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or
+$T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn
+controls values of $s_p, s_m$, is updated in the following manner,
 $$s_p=g^{\text{min}(s[k-1]+1,0)}, s_m = g^{s[k-1]-1}$$
 $$
 s[k]=
 \begin{cases}
-\text{min}(s[k-1]+1,0), \text{ for }c_n \in T^{\mathcal{C}}_p\\
+\text{min}(s[k-1]+1,0), \text{ for } \text{fb}_{i,t} \in T^{\mathcal{C}}_p\\
 s[k-1]-1, \text{otherwise}\\
 \end{cases}
 $$
-with $s[0]=0$. Intuitively, the algorithm reduces/increases the spread
-of the codebook till the operation of reduction/increase is no longer
-beneficial, i.e. the optimum codeword lies in the higher/lower spread
-codebook instead. The scheme we use for obtaining the quantized
-directions, however, differs slightly from the one presented in
-\cite{6891198}. As discussed in Section \ref{section3}, the Cayley
-type lifting map takes inputs from the Stiefel manifold and maps them
-to $N_T \times N_T$ skew Hermitian matrices. This allows for vector
-quantization of the tangent space, since a skew Hermitian matrix can
-be easily converted to a vector, by taking the upper triangular
-entries and stacking them in a vector. Vector quantization for the
-base codebook, $\mathcal{T}^B$ allows for isotropic $2^{\mathcal{B}-1}$ quantized
-directions for the tangent space local to $\bP_{k,l}$. \cite{6891198}
-proposed a randomly initialized $\mathcal{T}^B$ which does not guarantee
-isotropic $2^{\mathcal{B}-1}$ quantized directions, which can
-potentially hurt the performance of the system in the cases when
-random initialization gives directions which are close to each
-other. More details on codebook construction are provided in Section
-\ref{section5}. This concludes the proposed predictive quantization
-algorithm.}
+with $s[0]=0$. 
+Intuitively, the algorithm reduces/increases the spread of the codebook till the operation of reduction/increase is no longer beneficial, i.e. the optimum codeword lies in the higher/lower spread codebook instead. 
+The scheme used by us to obtain $\text{base}^{\mathcal{C}}$ is similar to the one presented in \cite{Gupt1905:Predictive}, which performs a $k$-means ($k=2^{\mathcal{B}-1}$) clustering on a collection of tangents to obtain an isotropic collection of $2^{\mathcal{B}-1}$ tangent codewords. 
+This completes the discussion on the quantization function $q_P$ to obtain $\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})$ from $\bP_{i,t},\text{fb}_{i,t}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % More information needed about the adjacency
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reservoir Training Procedure, the backward pass}
+\label{train}
+Armed with the descriptions of $f_P, q_P$ we are now ready to describe the training process for the reservoir.
+Recall that to obtain $\tilde{\bU}_{i,t}$ from  $\tilde{\bU}_{i,t-1}$, we have,
+\begin{equation}
+\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=q_P(f_P(\tilde{\bU}_{i,t-1}),\text{fb}_{i,t})
+\label{fpqp}
+\end{equation}
+The key idea here is that as the predicted matrix $\bP_{i,t}$, which is basically the coarse estimate for $\bU_{i,t}$, gets closer to the refined estimate $\tilde{\bU}_{i,t}$, the receiver has to quantize even smaller subspaces and can thus provide an even refined estimate via it's feedback $\text{fb}_{i,t}$.
+Hence, for the time instant $t\geq1$, we train the reservoir output coupler such that the following objective function is optimized,
+\begin{equation}
+\mathcal{O}_t=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\bp_{i,t}-\tilde{\bu}_{i,t}||^2=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||W_{i,t}^{\text{out}}\br_{i,t}-\tilde{\bu}_{i,t}||^2
+\end{equation}
+here $\lambda>1$ is the history parameter. We wish to perform the following optimization in order to find the optimum $\bW_{i,t}^{\text{out}}$ from whatever we have observed about $\tilde{\bu}_{i,t}$ uptill now,
+\begin{equation}
+W_{i,t}^{\text{out}}\gets\text{argmin}_{W_{i,t}^{\text{out}}}(\mathcal{O}_t=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||W_{i,t}^{\text{out}}\br_{i,t}-\tilde{\bu}_{i,t}||^2)
+\end{equation}
+Computing the gradients $\frac{\partial \mathcal{O}_t}{\partial W_{i,t}^{\text{out}}}$ and setting it to null gives,
+\begin{equation}
+W_{i,t}^{\text{out}}=\frac{\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}\texttt{outer}(\tilde{\bu}_{i,s},\br_{i,s})}{\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\br_{i,s}||^2}
+\end{equation}
+where $\texttt{outer}(\bx,\by)$ is the outer product between $N_x$ dimensional vector $\bx$ and $N_y$ dimensional vector $\by$ to give a $N_x\times N_y$ matrix. Let $\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}\texttt{outer}(\tilde{\bu}_{i,s},\br_{i,s})$ be $\text{num}_{i,t}$ and $\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\br_{i,s}||^2$ be $\text{den}_{i,t}$, with $W_{i,t}^{\text{out}}=\frac{\text{num}_{i,t}}{\text{den}_{i,t}}$. Observe that,
+\begin{equation}
+W_{i,t}^{\text{out}}=\frac{\frac{\text{num}_{i,t-1}}{\lambda}+\texttt{outer}(\tilde{\bu}_{i,t},\br_{i,t})}{\frac{\text{den}_{i,t-1}}{\lambda}+||\br_{i,t}||^2}
+\label{wout_upd}
+\end{equation}
+\eqref{wout_upd} makes training of the reservoir easy to implement, and of low complexity as well. 
+We just need to store the matrix $\text{num}_{i,t-1}$, a number $\text{den}_{i,t-1}$, and using the current reservoir state $\br_{i,t}$ and obtained $\tilde{\bu}_{i,t}$ from \eqref{fpqp}, one can calculate $W_{i,t}^{\text{out}}$ for forward calculation of $\tilde{\bu}_{i,t+1}$. 
+This completes our technical discussion for the complete reservoir computing based framework for predictive quantization illustrated in Fig. %Ref Fig.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+To conclude this section, now summarize and touch upon the novel points of the reservoir computing based framework proposed for predictive quantization of SVD precoding. 
+The first key advantage of the proposed framework, over the past work in this line \cite{Gupt1905:Predictive,6891198,6545375} is that the prediction function and quantization function are not independent of each other.
+To support the above statement, observe \eqref{res_upd},\eqref{fpqp} to obtain $\bW^{\text{out}}_{i,t}$ from $\tilde{\bu}_{i,t}$, and \eqref{fwd_pred} to obtain $\bP_{i,t+1}$ combinedly,
+\begin{equation*}
+\highlight{W_{i,t}^{\text{out}}}=\frac{\frac{\text{num}_{i,t-1}}{\lambda}+\texttt{outer}(\highlight{q_P}(f_P(\tilde{\bu}_{i,t-1}),\text{fb}_{i,t}),\br_{i,t})}{\frac{\text{den}_{i,t-1}}{\lambda}+||\br_{i,t}||^2}
+\end{equation*}
+\begin{equation*}
+\highlight{\bP_{i,t+1}}=f_P(\tilde{\bU}_{i,t})=\highlight{\bW^{\text{out}}_{i,t}}\text{tanh}(\bA_i\br_{i,t}+\bW^{\text{in}}_i\highlight{\tilde{\bu}_{i,t}})
+\end{equation*}
+The dependence between $f_P$ and $q_P$ in our framework is in the sense that the backward pass of the framework ensures that prediction function `'learns' the correlations brought about by $q_P$, in addition to temporal correlations. %Better framing possible
+This is done by optimizing $W_{i,t}^{\text{out}}$ such that the prediction output to be as close to the output from $q_P$ (Objective function $\mathcal{O}_t$).
+The updated $W_{i,t}^{\text{out}}$ is then used in forward pass to predict $\bP_{i,t+1}$, which is hopefully closer to $\tilde{\bU}_{i,t+1}$ than $\bP_{i,t}$ was to $\tilde{\bU}_{i,t}$ due to optimization of $\mathcal{O}_t$.
 
+The second key advantage of the proposed scheme comes from the ease of training the reservoir, entailed by \eqref{res_upd}. 
+By storing just one matrix $\text{num}_{i,t}$ and a number $\text{den}_{i,t}$, we can capture the history of the reservoir, with past values weighted by $\lambda$. 
+This is a departure from previous schemes \cite{Gupt1905:Predictive,6891198,6545375} which store the past $n$ (which has to be pre-decided) precoders in a $n$ sized cyclic buffer kind-of arrangement.
+Reservoir computing, thus proposes an easier to implement data centric scheme, which is a rarity for typical data centric ML based schemes. 
 \section{Simulation Results}
 \label{section4}
 %Qtisn error with 1000 chan evols
