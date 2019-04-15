@@ -185,12 +185,12 @@ Simulations reveal that this approach produces reduced quantization error, there
 \section{Introduction}
 \label{intro}
 % Broad summary of your work, come to your problem definition. 
-In MIMO wireless systems, precoding matrices are used for matrix transformation of $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto the $N_T$-dimensional transmit vector, corresponding to the signal emanating out of the $N_T$ antennas of the transmitter.
-The optimum precoding matrix, to achieve channel capacity via optimum power allocation is obtained via the SVD of the MIMO channel matrix. \cite{love2008overview}
+In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating out of the $N_T$ antennas of the transmitter.
+The precoding matrix used to achieve the channel capacity using optimal power allocation is obtained using the SVD of the MIMO channel matrix \cite{love2008overview}.
 The MIMO channel matrix is estimated at the receiver, and the transmitter has no a-priori knowledge of the same.
-Hence, to avail the said benefits of SVD precoders, the receiver needs to quantize and feedback the precoders it obtains from SVD of the MIMO channel matrix.
-To respect the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed only with a few single number of bits.
-Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits pose a significant challenge.
+Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it estimates from the SVD of the MIMO channel matrix.
+To honour the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed using very few bits.
+Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
 This challenge has been overcome in past work via two inherent properties of the precoders. 
