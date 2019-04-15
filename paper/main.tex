@@ -224,9 +224,6 @@ Reservoir computing has also been applied to solve problems in the domain of wir
 In our work, we utilize the reservoir computing framework to discover the underlying nonlinear relations between previously observed precoding matrices, in order to predict the next precoder in series.
 Upon vectorizing the precoding matrices, this becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
 
-The rest of this paper is organized as follows TODO
-%
-
 \section{System Model}
 \label{section2}
 \noindent We consider a point-to-point MIMO-OFDM wireless system that
@@ -267,10 +264,11 @@ Observe that predictive quantization algorithms for SVD precoders are typically 
 In both LPCs and Delta PCM, quantization error can be reduced substantially using a linear predictor and quantizing the scalar difference between the predicted and observed value (innovation).
 Analogous to this, for $\text{St}(N_T,N_R)$ quantization error is reduced by quantizing a subspace around the predicted value that is much smaller than the entire manifold.
 
-In our work, we propose a reservoir computing based prediction framework, which predicts the new precoders by tapping the temporal correlations captured from past observed precoders ($f_P$).
-We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}, however, by incorporating the $q_P$ in the prediction framework, as discussed in subsequent sections, the $f_P$ function also exploits correlations in $q_P$ (codebook locality correlations), along with temporal correlations.
-Previous work \cite{Gupt1905:Predictive,6891198} have $f_P$ and $q_P$ independent of each other.
-The detailed discussion on reservoir computing based model for $f_P$ and $q_P$ is presented in Section \ref{section3}.
+In our work, we propose a reservoir computing based prediction framework that predicts the new precoders by utilizing  temporal correlations that are captured from past observed precoders ($f_P$).
+We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}.
+However, by incorporating the $q_P$ in the prediction framework, as discussed in subsequent sections, the $f_P$ function also exploits correlations in $q_P$ (codebook locality correlations), along with temporal correlations.
+Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ to be independent of each other.
+A detailed discussion on the reservoir computing based model for $f_P$ and $q_P$ is presented in Section \ref{section3}.
 The proposed reservoir computing scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}. Finally, Section \ref{section5} concludes and presents future lines of work.
 
 %Explain prediction and quantization steps here itself ! (succintly)
