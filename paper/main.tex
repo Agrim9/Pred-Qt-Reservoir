@@ -275,15 +275,15 @@ The proposed reservoir computing scheme is evaluated against the temporal predic
 \section{Reservoir model for Predictive Quantization}
 \label{section3}
 \subsection{Vectorizing matrices in Stiefel Manifold}
-The reservoir computing framework has inputs/outputs as vectors, and hence it is necessary to convert the precoder matrices to vectors.
+The reservoir computing framework has inputs and outputs as vectors, and thus, it is necessary to convert the precoder matrices to vectors.
 A precoding matrix $\mathcal{\bM} \in \text{St}(N_T,N_R)$ is a $N_T\times N_R$ matrix with the property $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$.
-For brevity sake, let us say that such a matrix $\mathcal{\bM}$ is a \'semi-unitary\' matrix.
-A naive method of vectorizing a $N_T\times N_R$ semi-unitary matrix would be to take all it's $N_TN_R$ complex numbers individually and stack them onto a $2N_TN_R$ dimensional vector.
-However, we can do this a little more efficiently, considering the $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$ property, which implies that each vector representing the columns of $\mathcal{\bM}$ is orthogonal to other columns.
-For the first column, we take the $N_T$ complex numbers and stack them onto a $2N_T$ vector.
+For brevity, let us assume that such a matrix $\mathcal{\bM}$ is a \'semi-unitary\' matrix.
+A na{\"i}ve method to vectorize a $N_T\times N_R$ semi-unitary matrix would be to take all it's $N_TN_R$ complex numbers individually and stack them onto a $2N_TN_R$ dimensional real vector.
+However, a more efficiennt approach would be to use the $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$ property, which implies that each vector representing the columns of $\mathcal{\bM}$ is orthogonal to other columns.
+For the first column, we take its $N_T$ complex numbers and stack them onto a $2N_T$ vector.
 For the second column, we take only the first $N_T-1$ complex numbers, since the last number can be determined by utilizing orthogonality with the first vector.
 For the third column, we take only the first $N_T-2$ complex numbers, and so on.
-Hence, we can vectorize the $N_T\times N_R$ $\mathcal{\bM}$ into a $2(N_T)+2(N_T-1)+\ldots+2(N_T-N_R+1)= 2N_TN_R-(N_R^2-N_R)$ dimensional vector.
+Therefore, we can vectorize the $N_T\times N_R$ $\mathcal{\bM}$ into a $2(N_T)+2(N_T-1)+\ldots+2(N_T-N_R+1)= 2N_TN_R-(N_R^2-N_R)$ dimensional vector.
 For any semi-unitary matrix $\mathcal{\bM}$, denote by $\mathcal{\bm}$ the vectorized representation.
 
 Observe here that we do pay a dimensional penalty upon vectorizing the semi-unitary $\mathcal{\bM}$.
