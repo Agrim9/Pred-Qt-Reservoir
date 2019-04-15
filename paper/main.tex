@@ -224,46 +224,48 @@ Reservoir computing has also been applied to solve problems in the domain of wir
 In our work, we utilize the reservoir computing framework to discover the underlying nonlinear relations between previously observed precoding matrices, in order to predict the next precoder in series.
 Upon vectorizing the precoding matrices, this becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
 
+The rest of this paper is organized as follows TODO
 %
 
 \section{System Model}
 \label{section2}
 \noindent We consider a point-to-point MIMO-OFDM wireless system that
 has $N_T$ transmit antennas and $N_R$ receive antennas.
-The available bandwidth is divided into $N$ subcarriers, so that individually for each subcarrier, the channel can be considered flat fading.
-The transmitter communicates an $N_s \times 1$ information data vector, where
-$N_s \leq \text{min}(N_T,N_R)$, and the $N_T \times N_s$ precoding
-matrix maps the $N_s \times 1$ information data vector onto the $N_T \times 1$ transmit vector emanating out of the transmitter.
+The available bandwidth is divided into $N$ subcarriers, so that, individually for each subcarrier, the channel can be assumed to be flat fading.
+The transmitter communicates an $N_s \times 1$ information data vector, where $N_s \leq \text{min}(N_T,N_R)$, and the $N_T \times N_s$ precoding matrix maps the $N_s \times 1$ information data vector onto the $N_T \times 1$ transmit vector emanating out of the transmitter.
 
-In this discussion, we assume that $N_T > N_R$ and $N_s = N_R$. Keeping notations consistent with \cite{6891198,Gupt1905:Predictive}, the $N_R \times 1$ data stream received is denoted by:
+In this discussion, we assume that $N_T > N_R$ and $N_s = N_R$.
+Consistent with notation in \cite{6891198,Gupt1905:Predictive}, the $N_R \times 1$ data stream received on the $i$-th subcarrier is denoted by:
 \begin{equation}
 \by_{i,t}=\bH^{H}_{i,t}\tilde{\bU}_{i,t}\bx_{i,t}+ \bw_{i,t}
 \end{equation}
-Here $\tilde{\bU}_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the precoding matrix which is a function of quantized CSI fed back by the receiver, $\by_{i,t} \in \mathbb{C}^{N_R \times 1}$ is the received data stream, $\bx_{i,t} \in \mathbb{C}^{N_R \times 1}$ denotes the transmitted signal, all at the $i$-th subcarrier of the $t$-th OFDM frame, $\bH_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the MIMO channel matrix and $\bw_{i,t}$ denotes the i.i.d. complex Gaussian noise with $\bw_{i,t} \sim \mathcal{N}_{\mathbb{C}}(0,N_0\bI_{N_R})$, $N_0$ being the noise variance.
+$\tilde{\bU}_{i,t} \in \mathbb{C}^{N_T \times N_R}$ represents the precoding matrix, which is a function of quantized CSI fed back by the receiver, $\by_{i,t} \in \mathbb{C}^{N_R \times 1}$ is the received data stream, $\bx_{i,t} \in \mathbb{C}^{N_R \times 1}$ denotes the transmitted signal, $\bH_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the MIMO channel matrix and $\bw_{i,t}$ denotes the i.i.d. complex Gaussian noise with $\bw_{i,t} \sim \mathcal{N}_{\mathbb{C}}(0,N_0\bI_{N_R})$, $N_0$ being the noise variance.
 
 % Tell that if infinite bit budget available, transmitter can directly use matrices obtained from SVD as precoders. However, since this is not the case we have to quantize (N dimensional) manifold, incurring substantial quantization error. Independent quantization techniques (references). Predictive quantization techniques can be used on the top of independently initialized values to improve the error. This is done in a way intuitively similar to Delta PCM, in which quantization error is reduced substanitally by using a linear predictor and quantizing the difference between the predicted and observed value. Since these preocders lie on Stiefel manifold, linear schemes will not work, due to non linearity of the manifold. However,past work has generalized the ideas to the manifold by exploiting the differential geometry of the manifold. Once a prediction is obtained, one has to quantize only the difference between the prediction and the observed value, which allows for improved quantization error. As the prediction becomes closer to the original value, the quantization error also decreases. The quantization algorithm is illustrated in Section 3.3
 
 
-Provided an infinite bit budget for quantization, the transmitter can directly use the matrices obtained from SVD of $\bH^{H}_{i,t}$ as precoder $\tilde{\bU}_{i,t}$.
+If an infinite bit budget is available for quantization, the transmitter can directly use the matrices obtained from SVD of $\bH^{H}_{i,t}$ as the precoder $\tilde{\bU}_{i,t}$.
 In particular, if $\text{SVD}(\bH_{i,t}) = \bU_{i,t},\Sigma_{i,t}, \bV_{i,t}$, then $\tilde{\bU}_{i,t} = \bU_{i,t}$.
-Notice that matrices $\bU_{i,t}$ reside on the Stiefel manifold $\text{St}(N_T,N_R)$, since the columns of $\bU_{i,t}$ form a set of $N_R$ orthogonal vectors in $N_T$ dimensions \cite{Gupt1905:Predictive,6891198}.  Given practical limitations, only limited feedback is available from the receiver, and the objective is to find a `reasonable' estimate of $\bU_{i,t}$, given by $\tilde{\bU}_{i,t}$ using the available feedback bits.
+Notice that matrices $\bU_{i,t}$ reside on the Stiefel manifold $\text{St}(N_T,N_R)$, since the columns of $\bU_{i,t}$ form a set of $N_R$ orthogonal vectors in $N_T$ dimensions \cite{Gupt1905:Predictive,6891198}.
+Given practical limitations, only limited feedback is available from the receiver, and the objective is to find a `reasonable' estimate of $\bU_{i,t}$, given by $\tilde{\bU}_{i,t}$ using the available feedback bits.
 
-Algorithms similar to Lloyd codebook algorithm have been studied for quantizing $\text{St}(N_T,N_R)$ \cite{6678348}.
-However, this method treats precoders close-by in time/frequency to each other as independent, since it doesn't exploit any temporal/spectral correlations for quantization.
-Predictive quantization algorithms \cite{Gupt1905:Predictive,6891198} can be utilized to reduce the quantization error with time by tapping in available correlations.
+Algorithms similar to the Lloyd codebook algorithm have been studied for quantizing $\text{St}(N_T,N_R)$ \cite{6678348}.
+However, this method treats precoders that are close to each other in time or frequency as independent, since it does not exploit any temporal/spectral correlations for quantization.
+Predictive quantization algorithms \cite{Gupt1905:Predictive,6891198} can be utilized to reduce the quantization error with time by utilizing the available correlations.
 
-We now discuss the basic mathematical model central to predictive quantization algorithms for precoding matrices.
-Consider that we predict based on past $p$ observed precoding matrices, and hence $\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1}$ have been fed back and available at the transmitter.
-Using a prediction algorithm and exploiting time correlations among precoders at $t-p,t-p+1,\ldots,t-2,t-1$ time instances, the transmitter can predict $\tilde{\bU}_{i,t}$ to be some $\bP_{i,t}=f_P(\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1})$, where $f_P: \text{St}(N_T,N_R)^p \to \text{St}(N_T,N_R)$ is a prediction function.
-Now since the transmitter already knows a coarse estimate of $\tilde{\bU}_{i,t}$ given by $\bP_{i,t}$, the receiver just quantizes the local space of $\text{St}(N_T,N_R)$ nearby $\bP_{i,t}$ to enable a refined estimate of $\tilde{\bU}_{i,t}$ at the transmitter.
+We now discuss the basic mathematical model that is central to predictive quantization algorithms for precoding matrices.
+Suppose that we predict the current precoding matrix based on the past $p$ observed precoding matrices, and hence $\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1}$ have been fed back and available at the transmitter.
+By using a prediction algorithm  and by exploiting time correlations among precoders at $t-p,t-p+1,\ldots,t-2,t-1$ time instances, the transmitter can predict $\tilde{\bU}_{i,t}$ to be some $\bP_{i,t}=f_P(\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1})$, where $f_P: \text{St}(N_T,N_R)^p \to \text{St}(N_T,N_R)$ is a prediction function.
+Now, since the transmitter already possesses a coarse estimate of $\tilde{\bU}_{i,t}$ given by $\bP_{i,t}$, the receiver just quantizes the local space of $\text{St}(N_T,N_R)$ nearby $\bP_{i,t}$ to facilitate the construction of a refined estimate of $\tilde{\bU}_{i,t}$ at the transmitter.
 That is, the transmitter utilizes a quantization function $q_P:\text{St}(N_T,N_R) \times \mathbb{N} \to \text{St}(N_T,N_R)$, to obtain $\tilde{\bU}_{i,t} \gets q_P(\bP_{i,t},\text{fb}_{i,t})$, where $\text{fb}_{i,t} \in \{1,2\ldots2^{\mathcal{B}}\}$ is the feedback from the receiver for precoder at $i$-th subcarrier and $t$-th time instant, considering bit budget of $\mathcal{B}$ bits.
 In \cite{Gupt1905:Predictive,6891198,6545375}, $\text{fb}_{i,t}$ denotes the codeword index for the codebook obtained for quantizing the local tangent space at $\bP_{i,t}$.
 
-Since using predictive quantization scheme, quantization is on a smaller subspace as compared to the entire manifold in case of independent quantization, the quantization error is substantially lower as well.
-However, that being said, independent quantization algorithms are important for initialization the predictive quantization strategies.
-Observe that, predictive quantization algorithms for SVD precoders are typically the higher dimensional analogs of the well known approaches to reduce quantization error using Linear Prediction Codes and Delta PCM.
-In both LPC and Delta PCM, quantization error is reduced substantially by using a linear predictor and quantizing the scalar difference between the predicted and observed value.
-Analogous to this, for $\text{St}(N_T,N_R)$ quantization error is reduced by quantizing a smaller subspace around predicted value, compared to the entire manifold.
+When using predictive quantization scheme, the quantization is performed on a smaller subspace when compared to the entire manifold in case of independent quantization.
+Therefore, the quantization error is substantially lower as well.
+However, quantization algorithms that are independent of these specific predictive structures are important for the initialization of these predictive quantization strategies.
+Observe that predictive quantization algorithms for SVD precoders are typically the higher dimensional analogs of the well known approaches to reduce quantization error using linear prediction codes (LPCs) and Delta PCM.
+In both LPCs and Delta PCM, quantization error can be reduced substantially using a linear predictor and quantizing the scalar difference between the predicted and observed value (innovation).
+Analogous to this, for $\text{St}(N_T,N_R)$ quantization error is reduced by quantizing a subspace around the predicted value that is much smaller than the entire manifold.
 
 In our work, we propose a reservoir computing based prediction framework, which predicts the new precoders by tapping the temporal correlations captured from past observed precoders ($f_P$).
 We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}, however, by incorporating the $q_P$ in the prediction framework, as discussed in subsequent sections, the $f_P$ function also exploits correlations in $q_P$ (codebook locality correlations), along with temporal correlations.
