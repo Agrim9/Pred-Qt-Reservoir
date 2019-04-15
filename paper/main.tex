@@ -345,7 +345,12 @@ The receiver finds the optimal index $\text{fb}_{i,t} \in \{1,2,\ldots,2^{\mathc
 \tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=\text{retract}(\bP_{i,t},T^\mathcal{C}[\text{fb}_{i,t}])
 \label{eqn:cn2}
 \end{equation}
-
+\begin{figure*}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{images/system.pdf}
+\label{res_overview}
+\caption{An overview of the reservoir computing framework proposed for predictive quantization of $\bu_{i,t}$}
+\end{figure*}
 $\text{fb}_{i,t}$ is also used to update the spread of the codebooks $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$. 
 Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$,
 i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or
@@ -412,11 +417,18 @@ This is done by optimizing $W_{i,t}^{\text{out}}$ such that the prediction outpu
 The updated $W_{i,t}^{\text{out}}$ is then used in forward pass to predict $\bP_{i,t+1}$, which is hopefully closer to $\tilde{\bU}_{i,t+1}$ than $\bP_{i,t}$ was to $\tilde{\bU}_{i,t}$ due to optimization of $\mathcal{O}_t$.
 
 The second key advantage of the proposed scheme comes from the ease of training the reservoir, entailed by \eqref{res_upd}. 
-By storing just one matrix $\text{num}_{i,t}$ and a number $\text{den}_{i,t}$, we can capture the history of the reservoir, with past values weighted by $\lambda$. 
+By storing just one matrix $\text{num}_{i,t}$ and a number $\text{den}_{i,t}$, we can capture the enitre history of the precoding matrices, with past values weighted by $\lambda$. 
 This is a departure from previous schemes \cite{Gupt1905:Predictive,6891198,6545375} which store the past $n$ (which has to be pre-decided) precoders in a $n$ sized cyclic buffer kind-of arrangement.
 Reservoir computing, thus proposes an easier to implement data centric scheme, which is a rarity for typical data centric ML based schemes. 
+
+
 \section{Simulation Results}
 \label{section4}
+\subsection{Simulation setting considered}
+\label{setting}
+\noindent We compare the results of the proposed reservoir computing framework with the predictive quantization scheme presented in \cite{6891198}, which also captures the temporal correlations to enable reduced quantization error.
+\subsection{Quantization Error, BER and Achievable Rate Results}
+\label{res}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
 %BER

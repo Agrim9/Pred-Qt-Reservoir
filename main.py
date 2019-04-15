@@ -52,10 +52,11 @@ class reservoir:
 signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
-data=np.load("./BER_Data/ped_10_100_4_2.npy")
-ind_qt_data=np.load("./BER_Data/qt_ped_10_100_4_2.npy")
+norm=4
+data=np.load("./BER_Data/ped_10_100_4_2_norm"+str(norm)+".npy")
+ind_qt_data=np.load("./BER_Data/qt_ped_10_100_4_2_norm"+str(norm)+".npy")
 num_chans=10
-num_evols=1000
+num_evols=100
 Nt=4
 Nr=2
 past_vals=10
@@ -72,7 +73,7 @@ qtiz_err=np.zeros((num_chans,num_evols-1,feedback_subc))
 cmp_qtiz_U=np.zeros((num_chans,num_evols,feedback_subc,Nt,Nr),dtype='complex')
 cmp_qtiz_err=np.zeros((num_chans,num_evols-1,feedback_subc))
 time_vals=4
-for chan_inst in range(2,3):
+for chan_inst in range(num_chans):
 	print("--------------------------------------------------")
 	print("Starting Channel Instance: "+str(chan_inst))
 	print("--------------------------------------------------")
