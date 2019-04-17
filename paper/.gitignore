@@ -248,3 +248,8 @@ images/timeHop.pdf
 new_cmpr.pdf
 pred_qt.pdf
 		       
+*.aux
+*.bbl
+*.blg
+*.log
+main.pdf
