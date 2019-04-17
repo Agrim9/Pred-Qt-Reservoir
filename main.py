@@ -112,8 +112,13 @@ for chan_inst in range(num_chans):
 
 pdb.set_trace()
 
-# np.save('./BER_Data2/cmp_qtiz_U_1_1000.npy',cmp_qtiz_U)
-# np.save('./BER_Data2/cmp_qtiz_err_1_1000.npy',cmp_qtiz_err)
-# np.save('./BER_Data2/fin_qt_U_1_1000.npy',fin_qt_U)
-# np.save('./BER_Data2/qtiz_err_1_1000.npy',qtiz_err)
-# np.save('./BER_Data2/qtiz_U_1_1000.npy',qtiz_U)
+# np.save('./BER_Data2/cmp_qtiz_U_10_100_norm'+str(norm)+'.npy',cmp_qtiz_U)
+# np.save('./BER_Data2/cmp_qtiz_err_10_100_norm'+str(norm)+'.npy',cmp_qtiz_err)
+# np.save('./BER_Data2/fin_qt_U_10_100_norm'+str(norm)+'.npy',fin_qt_U)
+# np.save('./BER_Data2/qtiz_err_10_100_norm'+str(norm)+'.npy',qtiz_err)
+# np.save('./BER_Data2/qtiz_U_10_100_norm'+str(norm)+'.npy',qtiz_U)
+
+# import matplotlib.pyplot as plt
+# plt.plot(np.mean(np.mean(qtiz_err,axis=0),axis=1))
+# plt.plot(np.mean(np.mean(cmp_qtiz_err,axis=0),axis=1))
+# plt.show()

@@ -283,7 +283,7 @@ For the first column, we take the $N_T$ complex numbers and stack them onto a $2
 For the second column, we take only the first $N_T-1$ complex numbers, since the last number can be determined by utilizing orthogonality with the first vector. 
 For the third column, we take only the first $N_T-2$ complex numbers, and so on. 
 Hence, we can vectorize the $N_T\times N_R$ $\mathcal{\bM}$ into a $2(N_T)+2(N_T-1)+\ldots+2(N_T-N_R+1)= 2N_TN_R-(N_R^2-N_R)$ dimensional vector. 
-For any semi-unitary matrix $\mathcal{\bM}$, denote by $\mathcal{\bm}$ the vectorized representation.
+For any semi-unitary matrix $\mathcal{\bM}$, denote by $\mathcal{\bm}$ the vectorized representation. 
 
 Observe here that we do pay a dimensional penalty upon vectorizing the semi-unitary $\mathcal{\bM}$. 
 $\mathcal{\bM} \in \text{St}(N_T,N_R)$, which is a $2N_TN_R-N_R^2$ dimensional manifold. 
@@ -426,8 +426,11 @@ Reservoir computing, thus proposes an easier to implement data centric scheme, w
 \label{section4}
 \subsection{Simulation setting considered}
 \label{setting}
-\noindent We compare the results of the proposed reservoir computing framework with the predictive quantization scheme presented in \cite{6891198}, which also captures the temporal correlations to enable reduced quantization error.
+\noindent We compare the results of the proposed reservoir computing framework with the predictive quantization scheme presented in \cite{6891198}, which captures the temporal correlations to enable reduced quantization error.
+We simulate both our predictive quantization algorithms and the one presented in \cite{6891198} for the IEEE Pedestrian-A channel, with $N_T=4$, $N_R=2$. We simulated our algorithms by using the IT++ library through the Python wrapper py-itpp \cite{ViditPy}, with the channels being generated using Jake’s model for realistic simulations. Although in both our work and \cite{6891198}, only temporal correlations are exploited, we compare the BER, quantization error and logsum rate results for the MIMO-OFDM setting with number of subcarriers $N=64$, and evenly spaced $8$ feedback subcarriers, indexed from 0, viz. $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$). The precoding matrices at non fedback subcarriers ($i\neq\{9k\}$) are estimated via the Cayley Interpolation method presented in \cite{Gupt1905:Predictive}. Feedback is available for $i=\{9k\}$ subcarriers (i.e. transmitter obtains $\text{fb}_{\{9k\},t}$) for predictive quantization. The setting is visually illustrated in Fig. BER, quantization error results have been simulated for $f_DT_s=3.5\times10^{-4}$, whereas for achievable rate we compare results for $f_DT_s=10^{-4},10^{-2},10^{-1}$. 
+\newpage
 \subsection{Quantization Error, BER and Achievable Rate Results}
+Considering mitigation against randomly appearing drastic events in wireless channels, like sudden interferences, and dynamic environment, only 100 channel evolutions are considered for the simulations. 
 \label{res}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
