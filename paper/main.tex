@@ -90,7 +90,7 @@
 \usepackage[numbers,sort,square,compress]{natbib}
 \usepackage[para]{footmisc}
 \usepackage{xcolor}
-
+\setlength{\belowcaptionskip}{-10pt}
 \newcommand{\highlight}[1]{%
   \colorbox{red!50}{$\displaystyle#1$}}
 
@@ -166,7 +166,7 @@
   % significant improvement in achievable rate as well as BER reduction
   % when compared to existing strategies.
 
-Precoding matrices obtained from the SVD of the wireless MIMO channel matrix can be utilized at the transmitter for optimum power allocation and lower BER\footnote{Bit Error Rate} transmissions.
+Precoding matrices obtained from the SVD of the wireless MIMO channel matrix can be utilized at the transmitter for optimum power allocation and lower BER transmissions.
 However, a key step that enables this improved performance is feedback of these precoders to the transmitter from the receiver.
 Since bit budget for such channel state information (CSI) feedback is limited, precoders need to be quantized effectively using with very few bits.
 For a $N_T \times N_R$ MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
@@ -275,6 +275,7 @@ The proposed reservoir computing scheme is evaluated against the temporal predic
 \section{Reservoir model for Predictive Quantization}
 \label{section3}
 \subsection{Vectorizing matrices in Stiefel Manifold}
+\label{vectorize}
 The reservoir computing framework has inputs and outputs as vectors, and thus, it is necessary to convert the precoder matrices to vectors.
 A precoding matrix $\mathcal{\bM} \in \text{St}(N_T,N_R)$ is a $N_T\times N_R$ matrix with the property $\mathcal{\bM}^H\mathcal{\bM}=\mathbb{I}_{N_R}$.
 For brevity, let us assume that such a matrix $\mathcal{\bM}$ is a \'semi-unitary\' matrix.
@@ -294,8 +295,8 @@ However, this would lead to a non-unique representation, since there could then 
 %Focus on the fact that you don't actually pay a penalty
 %The thing to quantize remains on the Stiefel Manifold
 \subsection{Forward Prediction $f_P$ function}
-The vector representation of semi-unitary matrices allows us to proceed with the discussion on reservoir computing framework for predictive quantization of SVD precoders.
-Consider the reservoir computing framework shown in Fig. TODO %Ref Fig. Reservoir Pic
+\noindent The vector representation of semi-unitary matrices allows us to proceed with the discussion on reservoir computing framework for predictive quantization of SVD precoders.
+Consider the reservoir computing framework shown in Fig. \ref{res_overview} %Ref Fig. Reservoir Pic
 
 The input to the reservoir $i$ corresponding to subcarrier $i$ is $\tilde{\bu}_{i,t-1}$, which is the vectorized representation of $\tilde{\bU}_{i,t-1}$.
 Let $D_{\text{in}}=2N_TN_R-N_R^2+N_R$ be the dimension of the input vector to the dimension.
@@ -318,8 +319,8 @@ The output $\bp_{i,t}$ is obtained via matrix transformation of the reservoir st
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{images/system.pdf}
-\label{res_overview}
 \caption{An overview of the reservoir computing framework proposed for predictive quantization of $\bu_{i,t}$}
+\label{res_overview}
 \end{figure*}
 This completes the forward prediction algorithm to obtain $\bP_{i,t}$ using just one past observed $\bU_{i,t-1}$. That is,
 \begin{equation}
@@ -394,6 +395,7 @@ here $\lambda>1$ is the history parameter. We wish to perform the following opti
 Computing the gradients $\frac{\partial \mathcal{O}_t}{\partial \bW_{i,t}^{\text{out}}}$ and setting it to null gives,
 \begin{equation}
 \bW_{i,t}^{\text{out}}=\frac{\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}\texttt{outer}(\tilde{\bu}_{i,s},\br_{i,s})}{\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\br_{i,s}||^2}
+\label{backpass}
 \end{equation}
 where $\texttt{outer}(\bx,\by)$ is the outer product between $N_x$ dimensional vector $\bx$ and $N_y$ dimensional vector $\by$ to give a $N_x\times N_y$ matrix. Let $\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}\texttt{outer}(\tilde{\bu}_{i,s},\br_{i,s})$ be $\text{num}_{i,t}$ and $\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\br_{i,s}||^2$ be $\text{den}_{i,t}$, with $\bW_{i,t}^{\text{out}}=\frac{\text{num}_{i,t}}{\text{den}_{i,t}}$. Observe that,
 \begin{equation}
@@ -406,7 +408,7 @@ This completes our technical discussion for the complete reservoir computing bas
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To conclude this section, now summarize and touch upon the novel points of the reservoir computing based framework proposed for predictive quantization of SVD precoding.
+To conclude this section, we will now summarize and touch upon the novel points of the reservoir computing based framework proposed for predictive quantization of SVD precoding.
 The first key advantage of the proposed framework, over the past work in this line \cite{Gupt1905:Predictive,6891198,6545375} is that the prediction function and quantization function are not independent of each other.
 To support the above statement, observe \eqref{res_upd},\eqref{fpqp} to obtain $\bW^{\text{out}}_{i,t}$ from $\tilde{\bu}_{i,t}$, and \eqref{fwd_pred} to obtain $\bP_{i,t+1}$ combinedly,
 \begin{equation*}
@@ -429,18 +431,21 @@ Reservoir computing, thus proposes an easier to implement data centric scheme, w
 \label{section4}
 \subsection{Simulation setting considered}
 \label{setting}
-\noindent We compare the results of the proposed reservoir computing framework with the predictive quantization scheme presented in \cite{6891198}, which captures the temporal correlations to enable reduced quantization error.
-We simulate both our predictive quantization algorithms and the one presented in \cite{6891198} for the IEEE Pedestrian-A channel, with $N_T=4$, $N_R=2$. We simulated our algorithms by using the IT++ library through the Python wrapper py-itpp \cite{ViditPy}, with the channels being generated using Jake’s model for realistic simulations. Although in both our work and \cite{6891198}, only temporal correlations are exploited, we compare the BER, quantization error and logsum rate results for the MIMO-OFDM setting with number of subcarriers $N=64$, and evenly spaced $8$ feedback subcarriers, indexed from 0, viz. $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$). The precoding matrices at non fedback subcarriers ($i\neq\{9k\}$) are estimated via the Cayley Interpolation method presented in \cite{Gupt1905:Predictive}. Feedback is available for $i=\{9k\}$ subcarriers (i.e. transmitter obtains $\text{fb}_{\{9k\},t}$) for predictive quantization. The setting is visually illustrated in Fig. BER, quantization error results have been simulated for $f_DT_s=3.5\times10^{-4}$, whereas for achievable rate we compare results for $f_DT_s=10^{-4},10^{-2},10^{-1}$.
-\begin{figure}[h]
+\noindent We simulate both our predictive quantization algorithms and the one presented in \cite{6891198} for the IEEE Pedestrian-A channel, with $N_T=4$, $N_R=2$. We simulated our algorithms by using the IT++ library through the Python wrapper py-itpp \cite{ViditPy}, with the channels being generated using Jake’s model for realistic simulations. Although in both our work and \cite{6891198}, only temporal correlations are exploited, we compare the BER, quantization error and logsum rate results for the MIMO-OFDM setting with number of subcarriers $N=64$, and evenly spaced $8$ feedback subcarriers, indexed from 0, viz. $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$). The precoding matrices at non fedback subcarriers ($i\neq\{9k\}$) are estimated via the Cayley Interpolation method presented in \cite{Gupt1905:Predictive}. Feedback is available for $i=\{9k\}$ subcarriers (i.e. transmitter obtains $\text{fb}_{\{9k\},t}$) for predictive quantization. The setting is visually illustrated in Fig. \ref{table}. A 6 bit codebook generated via Lloyd codebook algorithm for the Stiefel Manifold in \cite{6678348} is used to feedback $\tilde{\bU}_{\{9k\},0}$ and differential quantization (i.e. $\bP_{i,t}=\tilde{\bU}_{i,t-1}$) is used for 10 time instances to provide provide the initial training data for the reservoir and for overcoming initial transient response of the reservoir discussed in \cite{mosleh2017brain}. A 6 bit base codebook is used for the quantization function $q_P$, generated via vector quantization via $k$-means over a tangent list, comprising of actual tangents from the predicted precoder to the actual precoder obtained from SVD of channel matrix, to guarantee isotropic codewords \cite{Gupt1905:Predictive}.
+
+For prediction of each of the $8$ fed-back subcarriers, we consider $8$ separate reservoirs, each of them evolved separately, with $i\in\{9k, k \in \{0,1,\ldots,7\}\}$ in both the forward pass prediction and quantization ($f_P,q_P$) \eqref{fpqp} and backward pass to update $\bW_{i,t}^{\text{out}}$ \eqref{backpass}. Unlike \cite{Gupt1905:Predictive}, we don't exploit frequency correlations for predictive quantization, and the $8$ reservoirs for prediction of $8$ fed-back subcarriers are kept independent of each other. All these 8 resrvoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Renyi\" graph, with probability of edge connections being $0.2$, $\lambda=2$, $\bW^{\text{out/in}}_{i\in\{9k\},0}$ being randomly assigned, $D_{\text{in}}=D_{\text{out}}=14$ (vectorized representation of $4\times2$ semi-unitary matrix, Section \ref{vectorize}) and $D_{\text{resv}}=60$.
+
+\begin{figure}
 \centering
 \includegraphics[width=0.5\textwidth]{images/table.pdf}
+\caption{The transmitter obtains feedback for $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$ subcarriers, and uses $\tilde{\bU}_{i,t-1}$, alongwith $f_P,q_P$ \eqref{fpqp} to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley mehtod to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ subcarriers}
 \label{table}
-\caption{The transmitter obtains feedback for $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$ subcarriers, and uses the $\tilde{\bU}_{i,t}$ of the previous time instance with $f_P,q_P$ (\eqref{fpqp}) to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley Exponential Lifting map to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ subcarriers}
 \end{figure}
-\newpage
+
 \subsection{Quantization Error, BER and Achievable Rate Results}
-\label{res}
+\label{res}{}
 Considering mitigation against randomly appearing drastic events in wireless channels, like sudden interferences, and dynamic environment, only 100 channel evolutions are considered for the simulations. Averaging is done over 10 independent channel realizations, to ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile. Hence, the quantization error, BER and achievable rate results are simulated for 1000 channel instances, with 100 channel evolutions of 10 independent channel realizations.
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{images/qtizErr.pdf}
@@ -472,7 +477,7 @@ For simulating the achievable rate for the point-to-point MIMO system considered
 %Achievable rat
 \section{Conclusions and Future Work}
 \label{section5}
-In this paper, we presented a reservoir computing framework to exploit temporal correlations for predictive quantization of SVD based precoders. The simulations reveal reduced quantization error, improved BER performance, and higher achievable rate from the proposed framework. This motivates further study into the framework as well, and future lines of work here would be a generalization of the framework to capture frequency correlations as well for predictive quantization, and a detailed analysis of impact on performance caused by choice of certain reservoir parameters like $\bA,\text{tanh}(\cdot)$, number of dimensions of the resrvoir state.
+In this paper, we presented a reservoir computing framework to exploit temporal correlations for predictive quantization of SVD based precoders. The simulations reveal reduced quantization error, improved BER performance, and higher achievable rate from the proposed framework. This motivates further study into the framework as well, and future lines of work here would be a generalization of the framework to capture frequency correlations as well for predictive quantization, and a detailed analysis of impact on performance caused by choice of certain reservoir parameters like $\bA,\text{tanh}(\cdot)$, number of dimensions of the reservoir state.
 
 
 % \section{Acknowledgment}
