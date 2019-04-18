@@ -315,7 +315,12 @@ The output $\bp_{i,t}$ is obtained via matrix transformation of the reservoir st
 \bp_{i,t}=\bW^{\text{out}}_{i,t-1}\br_{i,t}
 \label{pred_op}
 \end{equation}
-
+\begin{figure*}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{images/system.pdf}
+\label{res_overview}
+\caption{An overview of the reservoir computing framework proposed for predictive quantization of $\bu_{i,t}$}
+\end{figure*}
 This completes the forward prediction algorithm to obtain $\bP_{i,t}$ using just one past observed $\bU_{i,t-1}$. That is,
 \begin{equation}
 \bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_{i,t-1}\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For brevity, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
@@ -348,12 +353,7 @@ The receiver finds the optimal index $\text{fb}_{i,t} \in \{1,2,\ldots,2^{\mathc
 \tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=\text{retract}(\bP_{i,t},T^\mathcal{C}[\text{fb}_{i,t}])
 \label{eqn:cn2}
 \end{equation}
-\begin{figure*}[ht]
-\centering
-\includegraphics[width=0.8\textwidth]{images/system.pdf}
-\label{res_overview}
-\caption{An overview of the reservoir computing framework proposed for predictive quantization of $\bu_{i,t}$}
-\end{figure*}
+
 $\text{fb}_{i,t}$ is also used to update the spread of the codebooks $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$.
 Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$,
 i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or
@@ -431,16 +431,48 @@ Reservoir computing, thus proposes an easier to implement data centric scheme, w
 \label{setting}
 \noindent We compare the results of the proposed reservoir computing framework with the predictive quantization scheme presented in \cite{6891198}, which captures the temporal correlations to enable reduced quantization error.
 We simulate both our predictive quantization algorithms and the one presented in \cite{6891198} for the IEEE Pedestrian-A channel, with $N_T=4$, $N_R=2$. We simulated our algorithms by using the IT++ library through the Python wrapper py-itpp \cite{ViditPy}, with the channels being generated using Jake’s model for realistic simulations. Although in both our work and \cite{6891198}, only temporal correlations are exploited, we compare the BER, quantization error and logsum rate results for the MIMO-OFDM setting with number of subcarriers $N=64$, and evenly spaced $8$ feedback subcarriers, indexed from 0, viz. $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$). The precoding matrices at non fedback subcarriers ($i\neq\{9k\}$) are estimated via the Cayley Interpolation method presented in \cite{Gupt1905:Predictive}. Feedback is available for $i=\{9k\}$ subcarriers (i.e. transmitter obtains $\text{fb}_{\{9k\},t}$) for predictive quantization. The setting is visually illustrated in Fig. BER, quantization error results have been simulated for $f_DT_s=3.5\times10^{-4}$, whereas for achievable rate we compare results for $f_DT_s=10^{-4},10^{-2},10^{-1}$. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{images/table.pdf}
+\label{table}
+\caption{The transmitter obtains feedback for $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$ subcarriers, and uses the $\tilde{\bU}_{i,t}$ of the previous time instance with $f_P,q_P$ (\eqref{fpqp}) to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley Exponential Lifting map to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ subcarriers}
+\end{figure}
 \newpage
 \subsection{Quantization Error, BER and Achievable Rate Results}
-Considering mitigation against randomly appearing drastic events in wireless channels, like sudden interferences, and dynamic environment, only 100 channel evolutions are considered for the simulations. 
 \label{res}
+Considering mitigation against randomly appearing drastic events in wireless channels, like sudden interferences, and dynamic environment, only 100 channel evolutions are considered for the simulations. Averaging is done over 10 independent channel realizations, to ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile. Hence, the quantization error, BER and achievable rate results are simulated for 1000 channel instances, with 100 channel evolutions of 10 independent channel realizations.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{images/qtizErr.pdf}
+\caption{Quantization Error in terms of chordal distance to the actual precoder $\bU_{\{9k\},t}$ observed at the receiver, from the quantized estimate $\tilde{\bU}_{\{9k\},t}$ at the transmitter, averaged over 8 feedback subcarriers ($\{9k, k \in \{0,1,\ldots,7\}\}$) and 10 independent channel realizations ($f_DT_s=3.5\times10^{-4}$)}
+\label{qtiz_err}
+\end{figure}
+
+From Fig. \ref{qtiz_err} it is evident that the reservoir computing based predictive quantizer is able to reduce the quantization error below what was obtained from the existing temporal based predictive quantizer in \cite{6891198}. In addition, the quantization error is much more smoother, which can be explained from the fact that the reservoir computing approach optimizes, $\mathcal{O}_t$ which captures the long term dynamics of the channel and hence, is able to correct for jittery variations.
+
+We simulate the (uncoded QPSK) BER performance for precoders obtained after interpolation ($\tilde{\bU}_{i\neq\{9k\},t}$) and quantization ($\tilde{\bU}_{\{9k\},t}$), for all the 63 subcarriers. Observe from Fig. \ref{BER} that reservoir computing framework is able to achieve substantial imporvements in $\text{E}_\text{b}\text{N}_0$ levels at $\text{BER}\leq 10^{-3}$. Particularly, observe, for $\text{BER}=10^{-4}$ we observe around 5dB improvement. Also, notice the substanial improvement which both the predictive quantization schemes offer from the independent quantization scheme with Lloyd codebook for precoders \cite{6678348}, using the same number of bits. 
+
+For simulating the achievable rate for the point-to-point MIMO system considered, we quantize the sigma values ($\Sigma_{i,t}$ obtained from SVD of $\bH_{i,t}$) using a 2 bit vector quantizer ($k$-means), and feed them back to the transmitter for fed back subcarriers ($\{9k, k \in \{0,1,\ldots,7\}\}$). For the non-fed back subcarriers, they are interpolated via nai\"ve linear interpolation method as in \cite{Gupt1905:Predictive}. Observe from Fig. \ref{achievrate} that the reservoir computing framework offers signicant improvement in achievable rate for $f_DT_s=10^{-4}$. Since the temporal variations for $f_DT_s=10^{-2}, 10^{-1}$ are higher, the resrvoir computing framework has to learn a faster-varying function, and hence the degradation in performance. However, it still matches the performance of the predictive quantizer in \cite{6891198} for $f_DT_s=10^{-2}$ and performs slightly better for $f_DT_s=10^{-1}$.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{images/BER_res.pdf}
+\caption{BER results after obtaining non fed back $\tilde{\bU}_{i\neq\{9k\},t}$ from $\tilde{\bU}_{\{9k\},t}$ via Cayley interpolation \cite{Gupt1905:Predictive}, averaged over 10 independent channel realizations, 100 channel evolutions each ($f_DT_s=3.5\times10^{-4}$)}
+\label{BER}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{images/achievRate.pdf}
+\caption{Achievable Rate results for the two predictive quantization methods considered. The results are presented as a perecentage of the ideal acheivable rate obtained when the transmitter has the accurate (unquantized) and non-interpolated estimates of $\bU_{i,t}$ for each subcarrier and each time instant. The results have been averaged over 10 independent channel realizations, 100 channel evolutions each, for each $f_DT_s$}
+\label{achievrate}
+\end{figure}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
 %BER
 %Achievable rat
 \section{Conclusions and Future Work}
 \label{section5}
+In this paper, we presented a reservoir computing framework to exploit temporal correlations for predictive quantization of SVD based precoders. The simulations reveal reduced quantization error, improved BER performance, and higher achievable rate from the proposed framework. This motivates further study into the framework as well, and future lines of work here would be a generalization of the framework to capture frequency correlations as well for predictive quantization, and a detailed analysis of impact on performance caused by choice of certain reservoir parameters like $\bA,\text{tanh}(\cdot)$, number of dimensions of the resrvoir state. 
 
 
 % \section{Acknowledgment}
