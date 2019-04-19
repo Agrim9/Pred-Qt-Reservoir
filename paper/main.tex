@@ -166,18 +166,17 @@
   % significant improvement in achievable rate as well as BER reduction
   % when compared to existing strategies.
 
-Precoding matrices obtained from the SVD of the wireless MIMO channel matrix can be utilized at the transmitter for optimum power allocation and lower BER transmissions.
-However, a key step that enables this improved performance is feedback of these precoders to the transmitter from the receiver.
-Since bit budget for such channel state information (CSI) feedback is limited, precoders need to be quantized effectively using with very few bits.
-For a $N_T \times N_R$ MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
-This can be simplified by using the underlying manifold structure, and temporal/frequency correlations in the precoders.
-In this work, we introduce a reservoir computing based framework for prediction of the new precoders by observing pastprecoders and utilizing temporal correlations.
-Past methods have primarily exploited the nonlinear geometry endowed by the manifold structure to for precoder interpolation and prediction.
+
+Precoding matrices obtained from SVD of the MIMO channel matrix (estimated at the receiver) can be utilized at the transmitter for optimum power allocation and lower BER transmissions. 
+A key step enabling this improved performance is the feedback of these precoders to the transmitter from the receiver.
+Since the bit budget for such CSI\footnote{Channel State Info.} feedback is limited, these precoders need to be quantized effectively using just a few bits.
+For a $N_T \times N_R$\footnote{$N_T(R)$: Number of Transmit (Receive) Antennas} MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
+This task is aided by the presence of an underlying manifold structure and temporal/frequency correlations in the precoders. 
+Predictive quantization methods reduce the quantization error by predicting new precoders based on observation of past precoders, and then quantizing the step required to obtain the actual precoder from the predicted value. 
+In this work, we introduce a reservoir computing based framework for predictive quantization by exploiting temporal correlations. 
+Past methods have primarily exploited the nonlinear geometry endowed by the manifold structure to for precoder prediction.
 Here, this non-linear relationship is captured using the dynamical reservoir state as part of the training process of the reservoir.
 Simulations reveal that this approach produces reduced quantization error, thereby resulting in lower BER as well as improved achievable rates when compared to earlier work.
-
-
-
 \end{abstract}
 
 
