@@ -172,7 +172,7 @@ A key step enabling this improved performance is the feedback of these precoders
 Since the bit budget for such CSI\footnote{Channel State Info.} feedback is limited, these precoders need to be quantized effectively using just a few bits.
 For a $N_T \times N_R$\footnote{$N_T(R)$: Number of Transmit (Receive) Antennas} MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
 This task is aided by the presence of an underlying manifold structure and temporal/frequency correlations in the precoders. 
-Predictive quantization methods reduce the quantization error by predicting new precoders based on observation of past precoders, and then quantizing the step required to obtain the actual precoder from the predicted value. 
+Predictive quantization methods reduce the quantization error by predicting new precoders based on observation of past precoders, and then quantizing the information required to obtain the actual precoder from the predicted value. 
 In this work, we introduce a reservoir computing based framework for predictive quantization by exploiting temporal correlations. 
 Past methods have primarily exploited the nonlinear geometry endowed by the manifold structure to for precoder prediction.
 Here, this non-linear relationship is captured using the dynamical reservoir state as part of the training process of the reservoir.
@@ -187,26 +187,27 @@ Simulations reveal that this approach produces reduced quantization error, there
 In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating out of the $N_T$ antennas of the transmitter.
 The precoding matrix used to achieve the channel capacity using optimal power allocation is obtained using the SVD of the MIMO channel matrix \cite{love2008overview}.
 The MIMO channel matrix is estimated at the receiver, and the transmitter has no a-priori knowledge of the same.
-Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it estimates from the SVD of the MIMO channel matrix.
+Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it obtains from the SVD of the MIMO channel matrix.
 To honour the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed using very few bits.
 Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
-Past work has used two inherent properties of the precoders to enable effective low-rate precoder feedback.
-First, the precoders are not actually $2\times N_T\times N_R$ dimensional entities, and these have an underlying manifold structure that allows one to work with lower dimensions if one performs operations over the manifold directly.
+Past work has used two inherent properties of the precoders to enable effective quantization of these precoders, with just a few bits.
+First, the precoders are not actually $2\times N_T\times N_R$ dimensional entities, and these have an underlying manifold structure that allows one to work with lower dimensions, if one performs operations over the manifold directly.
 Second, these precoders are correlated in both time and frequency.
-Capturing temporal correlations allows the use off predictive quantization algorithms that improvement of the quantization error with time by effectively utilizing all information.
+Capturing the available correlations allow for predictive quantization algorithms, which enable improvement of the quantization error with time.
+This improvement is obtained because exploiting the available correlations from past fed back precoders allow one to just quantize the extra information required on top of the past available temporal-frequency information, instead of the new precoder information in the entirety.
 Exploiting frequency correlations permits the use of interpolation algorithms, which in turn reduce the feedback overhead in a single OFDM frame, by feeding back CSI information only for certain subcarriers, and interpolating over the others.
-Despite the existence of the underlying manifold structure that possesses effective lower dimensions, most of the na{\"i}ve algorithms that predict and interpolate are limited in their effectiveness, owing to the inherent non-linear structure of the manifold.
-Thus, combining these two properties, viz. the underlying manifold structure and temporal-frequency correlations, requires a generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
+Thus, combining these two inherent properties, viz. the underlying manifold structure and temporal-frequency correlations, requires a generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
 
 % What is the way ahead
-Manifold based approaches have provided significant performance benefits, given that they work with effective lower dimensions.
+Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
 However, these approaches are difficult to implement and require some familiarity with manifold geometry for a complete grasp.
 In this paper, we propose a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
-The proposed scheme offers a cleaner solution to the predictive quantization problem, which brings about both ease of implementability, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization.
+The proposed scheme offers a cleaner solution to the predictive quantization problem, which brings about both ease of implementability, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
 
 % How to we do this
+\textcolor{blue}{
 Reservoir computing is a computational framework designed for sequential data processing.
 Its design is inspired from several frameworks of recurrent neural networks \cite{jaeger2004harnessing}, including Liquid State Machines \cite{jalalvand2015real}.
 A reservoir computing system maps the inputs to spatio-temporal patterns in a higher dimensional dynamical reservoir state.
@@ -214,14 +215,13 @@ The pattern analysis over these spatio-temporal patterns is performed by an outp
 % A important characteristic of reservoir computing is that while training, the input weights and the weights within the reservoir are not kept fixed and the weights of the output coupler are updated.
 The key advantage of a reservoir computing based system is that it is extremely easy to train in comparison to its counterparts like Deep Neural Networks. CITATION NEEDED
 The input features can be efficiently learnt using a simple learning algorithm, since the reservoir non-linearly transforms sequential inputs into a higher dimensional reservoir state.
-Reservoir computing has been successfully used to solve problems like spoken digit recognition \cite{verstraeten2005isolated}, handwritten digit image recognition \cite{jalalvand2015real} and climate prediction \cite{pathak2017using}.
+Reservoir computing has been successfully used to solve problems like spoken digit recognition \cite{verstraeten2005isolated}, handwritten digit image recognition \cite{jalalvand2015real} and climate prediction \cite{pathak2017using}.}
 % Owing to the versatility of reservoir computing, it can deal with any sequential data in principle and hence further expansion of its application fields is widely expected.
 
-Reservoir computing has also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
-\cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities in order for smarter channel equalization.
-\cite{mosleh2017brain,shafin2018realizing} utilized this technique for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
-In our work, we utilize the reservoir computing framework to discover the underlying nonlinear relations between previously observed precoding matrices, in order to predict the next precoder in series.
-Upon vectorizing the precoding matrices, this becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
+\noindent Reservoir computing has also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
+\cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities for smarter channel equalization.
+\cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
+In our work, we utilize the reservoir computing framework to discover the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
 
 \section{System Model}
 \label{section2}
