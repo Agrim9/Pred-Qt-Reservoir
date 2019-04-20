@@ -84,6 +84,7 @@
 \usepackage{lastpage}
 \usepackage{lettrine}
 \usepackage{amsmath}
+\usepackage[normalem]{ulem}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{float}
 \usepackage[font={footnotesize}]{caption}
@@ -172,13 +173,12 @@ A key step enabling this improved performance is the feedback of these precoders
 Since the bit budget for such CSI\footnote{Channel State Info.} feedback is limited, these precoders need to be quantized effectively using just a few bits.
 For a $N_T \times N_R$\footnote{$N_T(R)$: Number of Transmit (Receive) Antennas} MIMO system, this amounts to quantizing a $N_T \times N_R$ complex valued matrix.
 This task is aided by the presence of an underlying manifold structure and temporal/frequency correlations in the precoders. 
-Predictive quantization methods reduce the quantization error by predicting new precoders based on observation of past precoders, and then quantizing the information required to obtain the actual precoder from the predicted value. 
+Predictive quantization methods reduce the quantization error by predicting new precoders based on observation of past precoders and then quantizing the information required to obtain the actual precoder from the predicted value. 
 In this work, we introduce a reservoir computing based framework for predictive quantization by exploiting temporal correlations. 
-Past methods have primarily exploited the nonlinear geometry endowed by the manifold structure to for precoder prediction.
+Past methods have primarily exploited the nonlinear geometry endowed by the manifold structure \textcolor{red}{\sout{to}} for precoder prediction.
 Here, this non-linear relationship is captured using the dynamical reservoir state as part of the training process of the reservoir.
 Simulations reveal that this approach produces reduced quantization error, thereby resulting in lower BER as well as improved achievable rates when compared to earlier work.
 \end{abstract}
-
 
 
 \section{Introduction}
@@ -189,7 +189,7 @@ The precoding matrix used to achieve the channel capacity using optimal power al
 The MIMO channel matrix is estimated at the receiver, and the transmitter has no a-priori knowledge of the same.
 Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it obtains from the SVD of the MIMO channel matrix.
 To honour the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed using very few bits.
-Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
+Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex\textcolor{red}{-}valued matrix, viz. $2\times N_T\times N_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
 Past work has used two inherent properties of the precoders to enable effective quantization of these precoders, with just a few bits.
@@ -209,12 +209,12 @@ The proposed scheme offers a cleaner solution to the predictive quantization pro
 % How to we do this
 \textcolor{blue}{
 Reservoir computing is a computational framework designed for sequential data processing.
-Its design is inspired from several frameworks of recurrent neural networks \cite{jaeger2004harnessing}, including Liquid State Machines \cite{jalalvand2015real}.
-A reservoir computing system maps the inputs to spatio-temporal patterns in a higher dimensional dynamical reservoir state.
-The pattern analysis over these spatio-temporal patterns is performed by an output coupler that maps the higher dimensional reservoir state back to the output dimension that generally possesses lower dimensionality than the reservoir state.
+Its design is inspired \textcolor{red}{by} several frameworks of recurrent neural networks \cite{jaeger2004harnessing}, including Liquid State Machines \cite{jalalvand2015real}.
+A reservoir computing system maps the inputs to \textcolor{red}{spatiotemporal} patterns in a higher dimensional dynamical reservoir state.
+The reservior states are then lineraly combined to create the output. The only trainable parameters of the system are those of the output coupler. These parameters can be learned by using regression.
 % A important characteristic of reservoir computing is that while training, the input weights and the weights within the reservoir are not kept fixed and the weights of the output coupler are updated.
-The key advantage of a reservoir computing based system is that it is extremely easy to train in comparison to its counterparts like Deep Neural Networks. CITATION NEEDED
-The input features can be efficiently learnt using a simple learning algorithm, since the reservoir non-linearly transforms sequential inputs into a higher dimensional reservoir state.
+The key advantage of a reservoir computing based system is that it is extremely easy to train in comparison to its counterparts like Deep Neural Networks \cite{Schrauwen07anoverview}.
+The input features can be efficiently \textcolor{red}{learned} using a simple learning algorithm since the reservoir non-linearly transforms sequential inputs into a higher dimensional reservoir state.
 Reservoir computing has been successfully used to solve problems like spoken digit recognition \cite{verstraeten2005isolated}, handwritten digit image recognition \cite{jalalvand2015real} and climate prediction \cite{pathak2017using}.}
 % Owing to the versatility of reservoir computing, it can deal with any sequential data in principle and hence further expansion of its application fields is widely expected.
 
