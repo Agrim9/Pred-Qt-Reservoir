@@ -90,7 +90,7 @@
 \usepackage[numbers,sort,square,compress]{natbib}
 \usepackage[para]{footmisc}
 \usepackage{xcolor}
-\setlength{\belowcaptionskip}{-10pt}
+\setlength{\belowcaptionskip}{-12pt}
 \newcommand{\highlight}[1]{%
   \colorbox{red!50}{$\displaystyle#1$}}
 
@@ -308,8 +308,9 @@ The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoi
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{images/system2.pdf}
-\caption{An overview of the reservoir computing framework proposed for predictive quantization of $\bu_{i,t}$}
+\caption{System Overview: The reservoir computing framework takes the precoder estimate at $t-1$ (viz. $\tilde{\bu_{i,t-1}}$) as input, and executes the forward pass of the predictive quantization framework, shaded in green, to obtain $\tilde{\bu_{i,t}}$. Both the transmitter and receiver utilize the same reservoir (initialized identically), with a minute difference indicated by the cyan shaded block. In the cyan shaded block, receiver finds the appropriate codeword for the $q_P$ function by comparing the prediction with the actual $\bU_{i,t}$, and communicates $\text{fb}_{i,t}$ to allow estimation of $\tilde{\bu}_{i,t}$ at the transmitter. Then, both the receiver and transmitter execute the backward pass (shaded in blue) to optimize $\mathcal{O}_{i,t}$ \eqref{oit}, to ensure identical evolution of both the reservoirs}
 \label{res_overview}
+\vspace{-10pt}
 \end{figure*}
 This completes the forward prediction to obtain $\bP_{i,t}$ using only the past observed $\bU_{i,t-1}$ (i.e. $p=1$, Section \ref{section2}). That is,
 \begin{equation}
@@ -377,6 +378,7 @@ The key idea here is that as the predicted matrix $\bP_{i,t}$ (the coarse estima
 Hence, for the time instant $t\geq1$, we train the reservoir output coupler such that the following objective function is optimized,
 \begin{equation}
 \mathcal{O}_{i,t}=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\bp_{i,t}-\tilde{\bu}_{i,t}||^2=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\bW_{i,t}^{\text{out}}\br_{i,t}-\tilde{\bu}_{i,t}||^2
+\label{oit}
 \end{equation}
 here $\lambda>1$ is the history parameter. We wish to perform the following optimization in order to find the optimum $\bW_{i,t}^{\text{out}}$ from our observations till time $t$,
 \begin{equation}
@@ -434,6 +436,7 @@ For predicting each of the $8$ fed-back subcarriers, we consider $8$ separate re
 \includegraphics[width=0.5\textwidth]{images/table.pdf}
 \caption{The transmitter obtains feedback for $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$ subcarriers, and uses $\tilde{\bU}_{i,t-1}$, alongwith $f_P,q_P$ \eqref{fpqp} to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley mehtod to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ subcarriers}
 \label{table}
+\vspace{-8pt}
 \end{figure}
 
 \subsection{Quantization error, BER and Achievable Rate Results}
@@ -454,16 +457,18 @@ We simulate the (uncoded QPSK) BER performance for precoders obtained after inte
 For simulating the achievable rate for the point-to-point MIMO system considered, we quantize the sigma values ($\Sigma_{i,t}$ obtained from SVD of $\bH_{i,t}$) using a 2 bit vector quantizer ($k$-means), and feed them back to the transmitter for fed back subcarriers ($\{9k, k \in \{0,1,\ldots,7\}\}$). For the non-fed back subcarriers, they are interpolated via nai\"ve linear interpolation method as in \cite{Gupt1905:Predictive}. Observe from Fig. \ref{achievrate} that the reservoir computing framework offers signicant improvement in achievable rate for $f_DT_s=10^{-4}$. Since the temporal variations for $f_DT_s=10^{-2}, 10^{-1}$ are higher, the reservoir computing framework has to learn a faster-varying function, and hence the degradation in performance. However, it still matches the performance of the predictive quantizer in \cite{6891198} for $f_DT_s=10^{-2}$ and performs slightly better for $f_DT_s=10^{-1}$.
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{images/BER_res.pdf}
+\includegraphics[width=0.45\textwidth]{images/BER_res.pdf}
 \caption{BER results after obtaining non fed back $\tilde{\bU}_{i\neq\{9k\},t}$ from $\tilde{\bU}_{\{9k\},t}$ via Cayley interpolation \cite{Gupt1905:Predictive}, averaged over 10 independent channel realizations, 100 channel evolutions each ($f_DT_s=3.5\times10^{-4}$)}
 \label{BER}
+\vspace{-8pt}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{images/achievRate.pdf}
+\includegraphics[width=0.45\textwidth]{images/achievRate.pdf}
 \caption{Achievable Rate results for the two predictive quantization methods considered. The results are presented as a perecentage of the ideal acheivable rate obtained when the transmitter has the accurate (unquantized) and non-interpolated estimates of $\bU_{i,t}$ for each subcarrier and each time instant. The results have been averaged over 10 independent channel realizations, 100 channel evolutions each, for each $f_DT_s$}
 \label{achievrate}
+\vspace{-13pt}
 \end{figure}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
@@ -471,8 +476,9 @@ For simulating the achievable rate for the point-to-point MIMO system considered
 %Achievable rat
 \section{Conclusions and Future Work}
 \label{section5}
+\vspace{-3pt}
 In this paper, we have presented a reservoir computing framework to exploit temporal correlations for predictive quantization of SVD based precoders. The simulations reveal reduced quantization error, improved BER performance, and higher achievable rate from the proposed framework. This motivates further study into the framework as well, and future lines of work here would be a generalization of the framework to capture frequency correlations as well for predictive quantization, and a detailed analysis of impact on performance caused by choice of certain reservoir parameters like $\bA,\text{tanh}(\cdot)$, number of dimensions of the reservoir state.
-
+\vspace{-5pt}
 
 % \section{Acknowledgment}
 % % \label {section6}
