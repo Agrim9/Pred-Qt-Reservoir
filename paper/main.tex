@@ -243,26 +243,28 @@ Given practical limitations, only limited feedback is available from the receive
 
 Independent quantization algorithms analogous to the Lloyd codebook algorithm have been studied for quantizing $\text{St}(N_T,N_R)$ \cite{6678348}.
 However, this approach treats precoders that are close to each other in time/frequency as independent, since it does not exploit any temporal/spectral correlations for quantization.
-Predictive quantization algorithms \cite{Gupt1905:Predictive,6891198} can be utilized to reduce the quantization error by utilizing the available correlations. We now discuss the basic mathematical model that is central to predictive quantization algorithms for precoding matrices.
+Predictive quantization algorithms \cite{Gupt1905:Predictive,6891198} can be utilized to reduce the quantization error by utilizing the available correlations.
+We now discuss the basic mathematical model that is central to predictive quantization algorithms for precoding matrices.
 Suppose that we predict the current precoding matrix based on the past $p$ observed precoding matrices, and hence $\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1}$ have been fed back and available at the transmitter.
-By using a prediction algorithm and by exploiting time correlations among precoders at $t-p,t-p+1,\ldots,t-2,t-1$ time instances, the transmitter can obtain a prediction (coarse estimate) of $\bU_{i,t}$, as $\bP_{i,t}=f_P(\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1})$, where $f_P: \text{St}(N_T,N_R)\times\ldots\{p-\text{times}\}\ldots\times\text{St}(N_T,N_R) \to \text{St}(N_T,N_R)$ is a prediction function.
+By using a prediction algorithm and by exploiting time correlations among precoders at time instances $t-p,t-p+1,\ldots,t-2,t-1$, the transmitter can obtain a prediction (coarse estimate) of $\bU_{i,t}$, as $\bP_{i,t}=f_P(\tilde{\bU}_{i,t-p},\tilde{\bU}_{i,t-p+1},\ldots,\tilde{\bU}_{i,t-2},\tilde{\bU}_{i,t-1})$, where $f_P: \text{St}(N_T,N_R)\times\ldots\{p-\text{times}\}\ldots\times\text{St}(N_T,N_R) \to \text{St}(N_T,N_R)$ is a prediction function.
 Now, since the transmitter already possesses a coarse estimate $\bP_{i,t}$ of $\bU_{i,t}$, the receiver just quantizes the local space of $\text{St}(N_T,N_R)$ nearby $\bP_{i,t}$, instead of the complete $\text{St}(N_T,N_R)$. The receiver feeds back this quantized information to the transmitter, enabling estimation of a refined estimate of $\bU_{i,t}$, given by $\tilde{\bU}_{i,t}$.
 That is, the transmitter utilizes a quantization function $q_P:\text{St}(N_T,N_R) \times \mathbb{N} \to \text{St}(N_T,N_R)$, to obtain $\tilde{\bU}_{i,t} \gets q_P(\bP_{i,t},\text{fb}_{i,t})$, where $\text{fb}_{i,t} \in \{1,2\ldots2^{\mathcal{B}}\}$ is the feedback from the receiver for precoder at $i$-th subcarrier and $t$-th time instant, considering bit budget of $\mathcal{B}$ bits.
 In \cite{Gupt1905:Predictive,6891198,6545375}, $\text{fb}_{i,t}$ denotes the codeword index for the codebook obtained for quantizing the local tangent space at $\bP_{i,t}$.
 
-When using predictive quantization scheme, the quantization is performed on a smaller subspace when compared to the entire manifold in case of independent quantization.
+When using the predictive quantization scheme, the quantization is performed on a smaller subspace when compared to the entire manifold in case of independent quantization.
 Therefore, the quantization error is substantially lower as well.
 However, independent quantization algorithms are important for smart initialization (instead of a cold start) of the predictive quantization strategies.
-Observe that predictive quantization algorithms for SVD precoders are typically the higher dimensional analogues of the well known approaches to reduce quantization error using linear prediction codes (LPCs) and Delta PCM.
+Observe that predictive quantization algorithms for SVD precoders are typically the higher dimensional analogues of well known approaches to reduce quantization error using linear prediction codes (LPCs) and Delta PCM.
 In both LPCs and Delta PCM, quantization error can be reduced substantially using a linear predictor and quantizing the scalar difference between the predicted and observed value (innovation).
 Analogous to this, for $\text{St}(N_T,N_R)$, quantization error is reduced by quantizing a subspace around the predicted value that is much smaller than the entire manifold.
 
-In our work, we propose a reservoir computing based prediction framework that predicts the new precoders by utilizing  temporal correlations that are captured from past observed precoders ($f_P$).
+In our work, we propose a reservoir computing based prediction framework that predicts the new precoders by utilizing temporal correlations that are captured from past observed precoders ($f_P$).
 We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}.
 However, by incorporating the $q_P$ in the prediction framework, as discussed in subsequent sections, the $f_P$ function also exploits correlations in $q_P$ (codebook locality correlations), along with temporal correlations.
 Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ to be independent of each other.
 A detailed discussion on the reservoir computing based model for $f_P$ and $q_P$ is presented in Section \ref{section3}.
-The proposed reservoir computing scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}. Finally, Section \ref{section5} concludes and presents future lines of work.
+The proposed reservoir computing scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}.
+Finally, Section \ref{section5} concludes and presents future lines of work.
 
 %Explain prediction and quantization steps here itself ! (succintly)
 \section{Reservoir model for Predictive Quantization}
