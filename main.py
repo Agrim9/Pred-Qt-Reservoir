@@ -52,9 +52,9 @@ class reservoir:
 signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
-norm=4
-data=np.load("./BER_Data/ped_10_100_4_2_norm"+str(norm)+".npy")
-ind_qt_data=np.load("./BER_Data/qt_ped_10_100_4_2_norm"+str(norm)+".npy")
+norm=3.5*1e-4
+data=np.load("./Fin_Data/BER/ped_10_100_4_2.npy")
+ind_qt_data=np.load("./Fin_Data/BER/qt_ped_10_100_4_2.npy")
 num_chans=10
 num_evols=100
 Nt=4
@@ -75,7 +75,7 @@ cmp_qtiz_err=np.zeros((num_chans,num_evols-1,feedback_subc))
 time_vals=4
 for chan_inst in range(num_chans):
 	print("--------------------------------------------------")
-	print("Starting Channel Instance: "+str(chan_inst))
+	print("Starting Channel Instance: "+str(chan_inst)+ " For Norm: "+str(norm))
 	print("--------------------------------------------------")
 
 	#Initialise with independent quantization
@@ -112,11 +112,11 @@ for chan_inst in range(num_chans):
 
 pdb.set_trace()
 
-# np.save('./BER_Data2/cmp_qtiz_U_10_100_norm'+str(norm)+'.npy',cmp_qtiz_U)
-# np.save('./BER_Data2/cmp_qtiz_err_10_100_norm'+str(norm)+'.npy',cmp_qtiz_err)
-# np.save('./BER_Data2/fin_qt_U_10_100_norm'+str(norm)+'.npy',fin_qt_U)
-# np.save('./BER_Data2/qtiz_err_10_100_norm'+str(norm)+'.npy',qtiz_err)
-# np.save('./BER_Data2/qtiz_U_10_100_norm'+str(norm)+'.npy',qtiz_U)
+# np.save('./Fin_Data/0.1/cmp_qtiz_U_10_100.npy',cmp_qtiz_U)
+# np.save('./Fin_Data/0.1/cmp_qtiz_err_10_100.npy',cmp_qtiz_err)
+# np.save('./Fin_Data/0.1/fin_qt_U_10_100.npy',fin_qt_U)
+# np.save('./Fin_Data/0.1/qtiz_err_10_100.npy',qtiz_err)
+# np.save('./Fin_Data/0.1/qtiz_U_10_100.npy',qtiz_U)
 
 # import matplotlib.pyplot as plt
 # plt.plot(np.mean(np.mean(qtiz_err,axis=0),axis=1))

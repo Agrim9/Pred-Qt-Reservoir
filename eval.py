@@ -13,10 +13,10 @@ signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
 norm=1
-U_data=np.load("./BER_Data/ped_10_100_4_2.npy")
-qt_U_data=np.load("./BER_Data/qt_ped_10_100_4_2.npy")
-H_data=np.load("./BER_Data/ped_10_100_4_2_H.npy")
-sigma_data=np.load("./BER_Data/ped_10_100_4_2_sigma.npy")
+U_data=np.load("./Fin_Data/0.1/ped_10_100_4_2.npy")
+qt_U_data=np.load("./Fin_Data/0.1/qt_ped_10_100_4_2.npy")
+H_data=np.load("./Fin_Data/0.1/ped_10_100_4_2_H.npy")
+sigma_data=np.load("./Fin_Data/0.1/ped_10_100_4_2_sigma.npy")
 num_chans=10
 num_evols=100
 Nt=4
@@ -34,20 +34,21 @@ Eb_N0_dB=np.arange(-3,22,2)
 resBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 otBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 unqtBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
+unqt_interpBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 indqtBER_QPSK=np.zeros(Eb_N0_dB.shape[0])
 count=0
-sil_BER=0
-sil_cap=1
+sil_BER=1
+sil_cap=0
 # qtiz_U=np.load('./Intmd_Res/qtiz_U0.npy')
 # cmp_qtiz_U=np.load('./Intmd_Res/cmp_qtiz_U0.npy')
 # cmp_qtiz_err=np.load('./Intmd_Res/cmp_qtiz_err0.npy')
 # qtiz_err=np.load('./Intmd_Res/qtiz_err0.npy')
 # fin_qt_U=np.load('./Intmd_Res/fin_qt_U0.npy')
-qtiz_U=np.load('./BER_Data2/qtiz_U_norm.npy')
-cmp_qtiz_U=np.load('./BER_Data2/cmp_qtiz_U_norm.npy')
-cmp_qtiz_err=np.load('./BER_Data2/cmp_qtiz_err_norm.npy')
-qtiz_err=np.load('./BER_Data2/qtiz_err_norm.npy')
-fin_qt_U=np.load('./BER_Data2/fin_qt_U_norm.npy')
+qtiz_U=np.load('./Fin_Data/0.1/qtiz_U_10_100.npy')
+cmp_qtiz_U=np.load('./Fin_Data/0.1/cmp_qtiz_U_10_100.npy')
+cmp_qtiz_err=np.load('./Fin_Data/0.1/cmp_qtiz_err_10_100.npy')
+qtiz_err=np.load('./Fin_Data/0.1/qtiz_err_10_100.npy')
+fin_qt_U=np.load('./Fin_Data/0.1/fin_qt_U_10_100.npy')
 sigma_cb=np.load('./Codebooks/Independent_qt/sigma_cb_2bits_10000.npy')
 num_Cappar=7
 avg_rescap=np.zeros(num_Cappar)
@@ -62,9 +63,10 @@ for chan_inst in range(num_chans):
 		print("Channel Evolution: "+str(i)+" Qtisn Error: "+str(np.mean(qtiz_err[chan_inst][i-1]))+" Cmp Qtisn Error: "+str(np.mean(cmp_qtiz_err[chan_inst][i-1])))
 		reservoir_reconstructed_Us=quasiGeodinterp(qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
 		time_reconstructed_Us=quasiGeodinterp(cmp_qtiz_U[chan_inst][i],num_subcarriers,feedback_indices)
-		unqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
-		# indqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(qt_U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
-		# reconstructed_sigmas=sigmaInterp_qtize(sigma_data[chan_inst][i][feedback_indices],num_subcarriers,feedback_indices,sigma_cb)
+		unqt_reconstructed_Us=np.array([vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in range(num_subcarriers)])
+		unqt_interp_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
+		indqt_reconstructed_Us=quasiGeodinterp(np.array([vec_to_semiunitary(qt_U_data[chan_inst][i][j],Nt,Nr) for j in feedback_indices]),num_subcarriers,feedback_indices)
+		reconstructed_sigmas=sigmaInterp_qtize(sigma_data[chan_inst][i][feedback_indices],num_subcarriers,feedback_indices,sigma_cb)
 		# pdb.set_trace()
 		if(sil_cap==0):
 			reconstructed_sigmas=sigmaInterp_qtize(sigma_data[chan_inst][i][feedback_indices],num_subcarriers,feedback_indices,sigma_cb)
@@ -96,20 +98,25 @@ for chan_inst in range(num_chans):
 		    BER_onlyt_QPSK=np.zeros(Eb_N0_dB.shape[0])
 		    BER_res_QPSK=np.zeros(Eb_N0_dB.shape[0])
 		    BER_unqt_QPSK=np.zeros(Eb_N0_dB.shape[0])
+		    BER_unqt_interp_QPSK=np.zeros(Eb_N0_dB.shape[0])
 		    BER_indqt_QPSK=np.zeros(Eb_N0_dB.shape[0])
 		    for i in range(Eb_N0_dB.shape[0]):
 		        BER_onlyt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),time_reconstructed_Us,Eb_N0_dB[i])
 		        BER_res_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),reservoir_reconstructed_Us,Eb_N0_dB[i])
 		        BER_unqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),unqt_reconstructed_Us,Eb_N0_dB[i])
-		        # BER_indqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),indqt_reconstructed_Us,Eb_N0_dB[i])
+		        BER_unqt_interp_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),unqt_interp_reconstructed_Us,Eb_N0_dB[i])
+		        BER_indqt_QPSK[i]=calculate_BER_performance_QPSK(np.array(H_data[chan_inst][i]),indqt_reconstructed_Us,Eb_N0_dB[i])
 		    resBER_QPSK=(count*resBER_QPSK+BER_res_QPSK)/(count+1)
 		    otBER_QPSK=(count*otBER_QPSK+BER_onlyt_QPSK)/(count+1)
 		    unqtBER_QPSK=(count*unqtBER_QPSK+BER_unqt_QPSK)/(count+1)
-		    # indqtBER_QPSK=(count*indqtBER_QPSK+BER_indqt_QPSK)/(count+1)
-		    print("ot_ber = np."+str(repr(otBER_QPSK)))
-		    print("res_ber = np."+str(repr(resBER_QPSK)))
-		    print("unqt_ber = np."+str(repr(unqtBER_QPSK)))
-		    # print("indqt_ber = np."+str(repr(indqtBER_QPSK)))
+		    unqt_interpBER_QPSK=(count*unqt_interpBER_QPSK+BER_unqt_interp_QPSK)/(count+1)
+		    indqtBER_QPSK=(count*indqtBER_QPSK+BER_indqt_QPSK)/(count+1)
+		    if(count%2==0):
+			    print("ot_ber = np."+str(repr(otBER_QPSK)))
+			    print("res_ber = np."+str(repr(resBER_QPSK)))
+			    print("unqt_ber = np."+str(repr(unqtBER_QPSK)))
+			    print("unqt_interp_ber = np."+str(repr(unqt_interpBER_QPSK)))
+			    print("indqt_ber = np."+str(repr(indqtBER_QPSK)))
 			
 		count=count+1
 
