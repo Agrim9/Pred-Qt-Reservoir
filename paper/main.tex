@@ -184,7 +184,7 @@ Simulations reveal that this approach produces reduced quantization error, there
 \section{Introduction}
 \label{intro}
 % Broad summary of your work, come to your problem definition.
-In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating out of the $N_T$ antennas of the transmitter.
+In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating from the $N_T$ antennas of the transmitter.
 The precoding matrix used to achieve the channel capacity using optimal power allocation is obtained using the SVD of the MIMO channel matrix \cite{love2008overview}.
 The MIMO channel matrix is estimated at the receiver, and the transmitter has no a priori knowledge of the same.
 Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it obtains from the SVD of the MIMO channel matrix.
@@ -195,16 +195,16 @@ Given the high dimensionality of the precoders (which form a $N_T \times N_R$ co
 Past work has used two inherent properties of the precoders to enable effective quantization of these precoders, with just a few bits.
 First, the precoders are not actually $2N_TN_R$ dimensional entities, and these have an underlying manifold structure that allows one to work with lower dimensions, if one performs operations over the manifold directly.
 Second, these precoders are correlated in both time and frequency.
-Capturing the available correlations allow for predictive quantization algorithms, which enable improvement of the quantization error with time.
+Capturing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
 This improvement is obtained because exploiting the available correlations from past fed back precoders allow one to just quantize the extra information required on top of the past available temporal-frequency information, instead of the new precoder information in the entirety.
-Exploiting frequency correlations permits the use of interpolation algorithms, which in turn reduces the feedback overhead in a single OFDM frame, by feeding back CSI information only for certain subcarriers, and interpolating over the others.
+Exploiting frequency correlations permits the use of interpolation algorithms, which in turn reduce the feedback overhead in a single OFDM frame, by feeding back CSI information only for certain subcarriers, and interpolating over the others.
 Thus, combining these two inherent properties, viz. the underlying manifold structure and temporal-frequency correlations, requires a generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
 
 % What is the way ahead
 Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
-However, these approaches are difficult to implement and require some familiarity with manifold geometry for a complete grasp.
+However, these approaches are difficult to implement and require some operations on the manifold structure.
 In this paper, we propose a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
-The proposed scheme offers a cleaner solution to the predictive quantization problem, which brings about both ease of implementability, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
+The proposed scheme offers a simple solution to the predictive quantization problem, which brings about both ease of implementation, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
 
 % How to we do this
 \textcolor{blue}{
@@ -221,12 +221,13 @@ Reservoir computing has been successfully used to solve problems like spoken dig
 \noindent Reservoir computing has also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
 \cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities for smarter channel equalization.
 \cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
-In our work, we utilize the reservoir computing framework to discover the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
+In our work, we utilize the reservoir computing framework to capture the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
 
 \section{System Model}
 \label{section2}
-\noindent We consider a point-to-point $N_T\times N_R$ MIMO-OFDM wireless system.
-The available bandwidth is divided into $N$ subcarriers, so that, individually for each subcarrier, the channel can be assumed to be flat fading. In this discussion, we assume that $N_T > N_R$ and $N_s = N_R$. Consistent with notation in \cite{6891198,Gupt1905:Predictive}, the data stream received on the $i$-th subcarrier is denoted by:
+We consider a point-to-point $N_T\times N_R$ MIMO-OFDM wireless system.
+The available bandwidth is divided into $N$ subcarriers, so that, individually for each subcarrier, the channel can be assumed to be flat fading.
+In this discussion, we assume that $N_T > N_R$ and $N_s = N_R$. Consistent with notation in \cite{6891198,Gupt1905:Predictive}, the data stream received on the $i$-th subcarrier is denoted by:
 \begin{equation}
 \by_{i,t}=\bH^{H}_{i,t}\tilde{\bU}_{i,t}\bx_{i,t}+ \bw_{i,t}
 \end{equation}
