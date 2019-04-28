@@ -273,32 +273,33 @@ Finally, Section \ref{section5} concludes and presents future lines of work.
 \label{vectorize}
 The traditional reservoir computing framework has inputs and outputs as vectors, and thus, it is necessary to convert the precoder matrices to vectors.
 A precoding matrix $\mathcal{\bM} \in \text{St}(N_T,N_R)$ is a $N_T\times N_R$ matrix with the property $\mathcal{\bM}^H\mathcal{\bM}=\text{\textbf{1}}_{N_R}$.
-For brevity, we call such a matrix $\mathcal{\bM}$ to be a `semi-unitary' matrix.
-A na{\"i}ve method to vectorize a $N_T\times N_R$ semi-unitary matrix would be to take all it's $N_TN_R$ complex numbers individually and stack them onto a $2N_TN_R$ dimensional real vector.
-However, a more efficient approach would be to use the $\mathcal{\bM}^H\mathcal{\bM}=\text{\textbf{1}}_{N_R}$ property, which implies that each vector representing the columns of $\mathcal{\bM}$ is orthogonal to the other columns.
+For brevity, we call such a matrix $\mathcal{\bM}$ a `semi-unitary' matrix.
+A na{\"i}ve method to vectorize a $N_T\times N_R$ semi-unitary matrix would be to take all its $N_TN_R$ complex numbers individually and stack them onto a $2N_TN_R$ dimensional real vector.
+However, a more efficient approach would be to use the $\mathcal{\bM}^H\mathcal{\bM}=\text{\textbf{1}}_{N_R}$ property, which implies that each vector that represents the columns of $\mathcal{\bM}$ is orthogonal to the other columns.
 For the first column, we take its $N_T$ complex numbers and stack them onto a $2N_T$ vector.
 For the second column, we take only the first $N_T-1$ complex numbers, since the last number can be determined by utilizing orthogonality with the first vector.
 For the third column, we take only the first $N_T-2$ complex numbers, and so on.
 Therefore, we can vectorize the $N_T\times N_R$ $\mathcal{\bM}$ into a $2(N_T)+2(N_T-1)+\ldots+2(N_T-N_R+1)= 2N_TN_R-(N_R^2-N_R)$ dimensional vector.
-For a semi-unitary matrix $\mathcal{\bM}$, denote by $\mathcal{\bm}$ it's vectorized representation.
+For a semi-unitary matrix $\mathcal{\bM}$, we denote by $\mathcal{\bm}$ its vectorized representation.
 
 Observe here that we incur a dimensional penalty upon vectorizing semi-unitary $\mathcal{\bM}$.
-$\mathcal{\bM} \in \text{St}(N_T,N_R)$, which is a $2N_TN_R-N_R^2$ dimensional manifold, whereas $\mathcal{\bm}$ is a $2N_TN_R-N_R^2+N_R$ dimensional vector. This corresponds to an overhead of $N_R$ dimensions, since we have not exploited the fact that each of the $N_R$ column vectors is a unit norm vector as well.
-It looks as if we could just take $N_T-1$ complex numbers when vectorizing the first column, instead of $N_T$, but this would lead to a non-unique representation, since there could then be infinite possibilities of the missing one complex number, such that the vector has a norm 1.
+$\mathcal{\bM} \in \text{St}(N_T,N_R)$, which is a $2N_TN_R-N_R^2$ dimensional manifold, whereas $\mathcal{\bm}$ is a $2N_TN_R-N_R^2+N_R$ dimensional vector.
+This corresponds to an overhead of $N_R$ dimensions, since we have not exploited the fact that each of the $N_R$ column vectors is a unit norm vector as well.
+It looks as if we could just take $N_T-1$ complex numbers when vectorizing the first column, instead of $N_T$, but this would lead to a non-unique representation, since there could then be infinite possibile values that the lone missing complex number can take, so that the vector has unit norm.
 %Focus on the fact that you don't actually pay a penalty
 %The thing to quantize remains on the Stiefel Manifold
 \subsection{Forward Prediction $f_P$ function}
 \noindent The vector representation of semi-unitary matrices allows to proceed with our discussion on reservoir computing framework.
 Consider the reservoir computing framework in Fig. \ref{res_overview} %Ref Fig. Reservoir Pic
 
-The input to the reservoir $i$ corresponding to subcarrier $i$ is $\tilde{\bu}_{i,t-1}$, (vectorized representation of $\tilde{\bU}_{i,t-1}$) with dimensions $D_{\text{in}}=2N_TN_R-N_R^2+N_R$.
-Using a randomly initialized $D_{\text{in}}\times D_{\text{resv}}$ input coupler matrix, $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}(>D_{\text{in}})$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation,
+The input to the reservoir $i$ that corresponds to subcarrier $i$ is $\tilde{\bu}_{i,t-1}$, (vectorized representation of $\tilde{\bU}_{i,t-1}$) with dimensions $D_{\text{in}}=2N_TN_R-N_R^2+N_R$.
+Using a randomly initialized $D_{\text{in}}\times D_{\text{resv}}$ input coupler matrix, $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}(>D_{\text{in}})$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation:
 \begin{equation}
 \br_{i,t}=\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})
 \label{res_upd}
 \end{equation}
 where $\bA_i$ is the adjacency matrix that captures the reservoir dynamics, and $\text{tanh}$ is applied element wise.
-Typical choices for $\bA_i$ have been Erdos-Renyi graphs with an upper bounded maximum eigen value \cite{mosleh2017brain,pathak2017using}.
+Typical choices for $\bA_i$ have been Erdos-Renyi graphs with an upper bounded maximum eigenvalue \cite{mosleh2017brain,pathak2017using}.
 
 The output of the reservoir is $\bp_{i,t}$, a vectorized representation of $\bP_{i,t}$.
 Therefore, the output of the reservoir is also a $D_{\text{in}}$ dimensional vector ($D_{\text{out}}=D_{\text{in}}$).
