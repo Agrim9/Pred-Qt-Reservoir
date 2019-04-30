@@ -196,13 +196,13 @@ Past work has used two inherent properties of the precoders to enable effective 
 First, the precoders are not actually $2N_TN_R$ dimensional entities, and these have an underlying manifold structure that allows one to work with lower dimensions, if one performs operations over the manifold directly.
 Second, these precoders are correlated in both time and frequency.
 Capturing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
-This improvement is obtained because exploiting the available correlations from past fed back precoders allow one to just quantize the extra information required on top of the past available temporal-frequency information, instead of the new precoder information in the entirety.
+This improvement is obtained because exploiting the available correlations allow for quantization of just the small extra information needed on top of the past fed back estimates, instead of quantizing the complete new precoder information in the entirety.
 Exploiting frequency correlations permits the use of interpolation algorithms, which in turn reduce the feedback overhead in a single OFDM frame, by feeding back CSI information only for certain subcarriers, and interpolating over the others.
 Thus, combining these two inherent properties, viz. the underlying manifold structure and temporal-frequency correlations, requires a generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
 
 % What is the way ahead
 Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
-However, these approaches are difficult to implement and require some operations on the manifold structure.
+However, these approaches are non-trivial, since they require specific operations over the non-linear manifold differential geometry.
 In this paper, we propose a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
 The proposed scheme offers a simple solution to the predictive quantization problem, which brings about both ease of implementation, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
 
@@ -210,20 +210,20 @@ The proposed scheme offers a simple solution to the predictive quantization prob
 %\textcolor{blue}
 {
 Reservoir computing is a computational framework designed for sequential data processing.
-Its design is inspired from several frameworks of recurrent neural networks \cite{jaeger2004harnessing}, including Liquid State Machines \cite{jalalvand2015real}.
-A reservoir computing system maps the inputs to spatio temporal patterns in a higher dimensional dynamical reservoir state.
-The pattern analysis over these spatio temporal patterns is performed by an output coupler that maps the higher dimensional reservoir state back to the output dimension that generally possesses lower dimensionality than the reservoir state.
+Its design is inspired from several frameworks of recurrent neural networks \cite{jaeger2004harnessing}, including Liquid State Machines \cite{jalalvand2015real} and Echo State Networks \cite{mosleh2017brain,pathak2017using}.
+The reservoir computing framework represents the non-linear relationships in the data via the higher dimensional dynamical reservoir state vector, which is transformed (using
+matrices, referred to as `couplers') to the lower dimensional input/output vectors
+% A reservoir computing system maps the inputs to temporal patterns in a higher dimensional dynamical reservoir state.
+% The pattern analysis over these temporal patterns is performed by an output coupler that maps the higher dimensional reservoir state back to the output dimension that generally possesses lower dimensionality than the reservoir state.
 % A important characteristic of reservoir computing is that while training, the input weights and the weights within the reservoir are not kept fixed and the weights of the output coupler are updated.
-The key advantage of a reservoir computing based system is that it is easy to train in comparison to its counterparts like Deep Neural Networks \cite{mosleh2017brain}.
-The input features can be efficiently learnt using a simple learning algorithm, since the reservoir non-linearly transforms sequential inputs into a higher dimensional reservoir state.
-Reservoir computing has been successfully used to solve problems like handwritten digit image recognition \cite{jalalvand2015real}, spoken digit recognition \cite{verstraeten2005isolated}, and climate prediction \cite{pathak2017using}.
+The key advantage of a reservoir computing framework is that it is easy to train in comparison to its counterparts like Deep Neural Networks \cite{mosleh2017brain}.
+Reservoir computing has been successfully used to solve problems like handwritten digit image recognition \cite{jalalvand2015real}, climate prediction \cite{pathak2017using} and spoken digit recognition \cite{verstraeten2005isolated}.
 }
 % Owing to the versatility of reservoir computing, it can deal with any sequential data in principle and hence further expansion of its application fields is widely expected.
-
-Reservoir computing has also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
-\cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities for smarter channel equalization.
+Reservoir computing frameworks have also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
+\cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities for improved channel equalization.
 \cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
-In our work, we utilize the reservoir computing framework to capture the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been known to work effectively \cite{mosleh2017brain}.
+In our work, we utilize the reservoir computing framework to capture the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been cited to work effectively \cite{mosleh2017brain}.
 
 \section{System Model}
 \label{section2}
@@ -266,7 +266,7 @@ However, by incorporating the $q_P$ in the prediction framework, as discussed in
 Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ to be independent of each other.
 A detailed discussion on the reservoir computing based model for $f_P$ and $q_P$ is presented in Section \ref{section3}.
 The proposed reservoir computing scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}.
-Finally, Section \ref{section5} concludes and presents future lines of work.
+Finally, Section \ref{section5} concludes the proposed framework and presents future lines of work.
 
 %Explain prediction and quantization steps here itself ! (succintly)
 \section{Reservoir model for Predictive Quantization}
@@ -295,7 +295,7 @@ It looks as if we could just take $N_T-1$ complex numbers when vectorizing the f
 Consider the reservoir computing framework in Fig. \ref{res_overview} %Ref Fig. Reservoir Pic
 
 The input to the reservoir $i$ that corresponds to subcarrier $i$ is $\tilde{\bu}_{i,t-1}$, (vectorized representation of $\tilde{\bU}_{i,t-1}$) with dimensions $D_{\text{in}}=2N_TN_R-N_R^2+N_R$.
-Using a randomly initialized $D_{\text{in}}\times D_{\text{resv}}$ input coupler matrix, $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}(>D_{\text{in}})$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation:
+Using a randomly initialized $D_{\text{in}}\times D_{\text{resv}}$ input coupler matrix, $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}(>>D_{\text{in}})$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation:
 \begin{equation}
 \br_{i,t}=\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})
 \label{res_upd}
@@ -349,7 +349,7 @@ The receiver finds the optimal index $\text{fb}_{i,t} \in \{1,2,\ldots,2^{\mathc
 \label{eqn:cn2}
 \end{equation}
 $\text{fb}_{i,t}$ is also used to update the spread of the codebooks $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$.
-Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$, i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or $T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn controls values of $s_p, s_m$, is updated accordingly, as
+Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$, i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or $T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn controls values of $s_p, s_m$, is updated as,
 $$s_p=g^{\text{min}(s[k-1]+1,0)}, s_m = g^{s[k-1]-1}$$
 $$
 s[k]=
