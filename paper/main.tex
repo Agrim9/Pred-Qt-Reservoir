@@ -234,7 +234,7 @@ Reservoir computing has been successfully used to solve problems like handwritte
 Reservoir computing frameworks have also been applied to solve problems in the domain of wireless communications \cite{jaeger2004harnessing,mosleh2017brain,shafin2018realizing}.
 \cite{jaeger2004harnessing} used reservoir computing framework to harness channel non-linearities for improved channel equalization.
 \cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
-In our work, we utilize the reservoir computing framework to capture the underlying nonlinear relations between previously observed precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been cited to work effectively \cite{mosleh2017brain}.
+In our work, we utilize the reservoir computing framework to capture the underlying nonlinear relations between previously obtained quantized precoders, in order to predict the precoder at next time instant. This becomes analogous to time series prediction algorithms, for which the reservoir computing framework has been cited to work effectively \cite{mosleh2017brain}.
 
 \section{\textbf{System Model}}
 \label{section2}
@@ -320,7 +320,9 @@ The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoi
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{images/system2.pdf}
-\caption{System Overview: The reservoir computing framework takes the precoder estimate at $t-1$ (viz. $\tilde{\bu}_{i,t-1}$) as input, and executes the forward pass of the predictive quantization framework, shaded in green, to obtain $\tilde{\bu}_{i,t}$. Both the transmitter and receiver utilize the same reservoir (initialized identically), with a minute difference indicated by the cyan shaded block. In the cyan shaded block, receiver finds the appropriate codeword for the $q_P$ function by comparing the prediction with the actual $\bU_{i,t}$, and communicates $\text{fb}_{i,t}$ to allow estimation of $\tilde{\bu}_{i,t}$ at the transmitter. Then, both the receiver and transmitter execute the backward pass (shaded in blue) to optimize $\mathcal{O}_{i,t}$ \eqref{oit}, to ensure identical evolution of both the reservoirs}
+% \caption{System Overview: The reservoir computing framework takes the precoder estimate at $t-1$ (viz. $\tilde{\bu}_{i,t-1}$) as input, and executes the forward pass of the predictive quantization framework, shaded in green, to obtain $\tilde{\bu}_{i,t}$. Both the transmitter and receiver utilize the same reservoir (initialized identically), with a minute difference indicated by the cyan shaded block. In the cyan shaded block, receiver finds the appropriate codeword for the $q_P$ function by comparing the prediction with the actual $\bU_{i,t}$, and communicates $\text{fb}_{i,t}$ to allow estimation of $\tilde{\bu}_{i,t}$ at the transmitter. Then, both the receiver and transmitter execute the backward pass (shaded in blue) to optimize $\mathcal{O}_{i,t}$ \eqref{oit}, to ensure identical evolution of both the reservoirs}
+\caption{Forward Prediction (Green): Both the transmitter and receiver utilize identical reservoirs and quantized precoder estimate at $t-1$ (i.e. $\tilde{\bu}_{i,t-1}$, top left of figure) to obtain $\bP_{i,t}$ via \eqref{fwd_pred}. The transmitter estimates the quantized precoder at $t$ (i.e. $\tilde{\bu}_{i,t}$, top right of figure) using receiver feedback $\text{fb}_{i,t}$ via $q_P$ \eqref{eqn:cn2}. 
+\\Feedback Estimation (Cyan): The Receiver estimates the ideal $\text{fb}_{i,t}$ using the exact precoders $\bU_{i,t}$ via \eqref{eqn:cn1}. The transmitter observes only the feedback $\text{fb}_{i,t}$\\ Backward Pass (Blue): $\bW^{\text{out}}_{i,t}$ is updated via \eqref{wout_upd} for optimizing $\mathcal{O}_{i,t}$. This is done at both transmitter and receiver to ensure identical evolution of the reservoirs} 
 \label{res_overview}
 \vspace{-5pt}
 \end{figure*}
@@ -428,8 +430,8 @@ This enables $q_P$ to quantize even smaller subspaces, since the coarse estimate
 % \end{equation}
 
 %\textcolor{blue}
-{Another advantage of the proposed scheme is the ease of training the reservoir, captured in \eqref{res_upd}.
-By storing just one matrix $\text{\textbf{num}}_{i,t}$ and a number $\text{den}_{i,t}$, we capture the entire history of the precoding matrices, with past values weighted by $\lambda$.
+{\noindent Another advantage of the proposed scheme is the ease of training the reservoir, captured in \eqref{res_upd}.
+By storing just one matrix $\text{\textbf{num}}_{i,t}$ and a number $\text{den}_{i,t}$, we capture the entire history of the obtained quantized precoders, with past values weighted by $\lambda$ in $\mathcal{O}_{i,t}$ \eqref{oit}.
 This is a departure from previous schemes \cite{Gupt1905:Predictive,6891198,6545375} which store the past $p$ precoders precoders in a $p$ sized cyclic buffer ($p$ also has to be pre-decided).
 Reservoir computing, thus proposes an easy to train data centric scheme, which is not typical for data centric ML based schemes.
 }
