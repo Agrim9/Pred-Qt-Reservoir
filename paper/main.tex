@@ -190,26 +190,26 @@ Simulations reveal that this approach produces reduced quantization error, there
 \label{intro}
 % Broad summary of your work, come to your problem definition.
 In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ information vector onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating from the $N_T$ antennas of the transmitter.
-The precoding matrix used to achieve the channel capacity using optimal power allocation is obtained using the SVD of the MIMO channel matrix \cite{love2008overview}.
+The precoding matrix used to achieve the channel capacity using optimal power allocation is obtained via the SVD of the MIMO channel matrix \cite{love2008overview}.
 The MIMO channel matrix is estimated at the receiver, and the transmitter has no a priori knowledge of the same.
-Therefore, to obtain the said benefits of SVD precoders, the receiver needs to quantize and feed back the precoders it obtains from the SVD of the MIMO channel matrix.
+Therefore, to obtain the said benefits of SVD precoders at the transmitter, the receiver needs to quantize and feed back the precoders it obtains from the SVD of MIMO channel matrix.
 To respect the bit budget imposed by limited feedback CSI schemes, the quantization needs to be performed using very few bits.
-Given the high dimensionality of the precoders (which form a $N_T \times N_R$ complex-valued matrix, viz. $2N_TN_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
+Given the high dimensionality of precoders (which form a $N_T \times N_R$ complex-valued matrix, viz. $2N_TN_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
-Past work has used two inherent properties of the precoders to enable effective quantization of these precoders, with just a few bits.
-First, the precoders are not actually $2N_TN_R$ dimensional entities, and these have an underlying manifold structure that allows one to work with lower dimensions, if one performs operations over the manifold directly.
+Past work has used two inherent properties of the precoders to enable effective quantization with just a few bits.
+First, the precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with lower dimensions, when performing operations over the manifold directly.
 Second, these precoders are correlated in both time and frequency.
-Capturing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
-This improvement is obtained because exploiting the available correlations allow for quantization of just the small extra information needed on top of the past fed back estimates, instead of quantizing the complete new precoder information in the entirety.
-Exploiting frequency correlations permits the use of interpolation algorithms, which in turn reduce the feedback overhead in a single OFDM frame, by feeding back CSI information only for certain subcarriers, and interpolating over the others.
-Thus, combining these two inherent properties, viz. the underlying manifold structure and temporal-frequency correlations, requires a generalization of such linear algorithms to the manifold under consideration, by exploiting the differential geometry of the manifold. Relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
+Utilizing these correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
+This improvement is obtained because utilizing the available correlations allow for quantization of just the small extra information needed on top of the past fed back estimates, for estimation of the new precoder, as compared to quantization of the complete new precoder information in the entirety.
+Exploiting frequency correlations permits the use of interpolation algorithms, which reduce the feedback overhead in a single OFDM frame, by feeding back CSI only for certain subcarriers, and interpolating over the others.
+Combining the two inherent properties (viz. manifold structure and correlations), requires a generalization of various well known linear algorithms for prediction, quantization and interpolation, to the manifold structure under consideration. This is done by exploiting the underlying non-linear differential geometry of the manifold. Relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,khaled2005quantized,krishnamachari2013geometry}.
 
 % What is the way ahead
 Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
 However, these approaches are non-trivial, since they require specific operations over the non-linear manifold differential geometry.
 In this paper, we propose a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
-The proposed scheme offers a simple solution to the predictive quantization problem, which brings about both ease of implementation, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
+The proposed scheme offers a simple solution to the predictive quantization problem, which brings about ease of implementation, and improved performance as well, when compared to \cite{6891198}, which proposed a manifold based method of predictive quantization by exploiting temporal correlations.
 
 % How to we do this
 %\textcolor{blue}
