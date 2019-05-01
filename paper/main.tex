@@ -110,6 +110,11 @@
 % \renewcommand{\headrulewidth}{0pt}
 % \fancyhead[C]{2018 International Conference on Indoor Positioning and Indoor Navigation (IPIN), 24-27 September 2018, Nantes, France}
 \DeclareMathOperator*{\argmin}{argmin}
+% \usepackage{titlesec}
+
+% \titlespacing*{\section}{0pt}{1pt plus 2p}{1ex}
+% \titleformat*{\section}{\fontsize{12}{12}\bfseries}
+
 \begin{document}
 %Here goes the title
 
@@ -426,14 +431,15 @@ This is a departure from previous schemes \cite{Gupt1905:Predictive,6891198,6545
 Reservoir computing, thus proposes an easier to train (data centric) scheme, which is not typical in data centric ML based schemes.
 }
 
-\vspace{-4pt}
 \section{Simulation Results}
 \label{section4}
+
 \subsection{Simulation setting considered}
 \label{setting}
+
 \noindent The simulations have been performed for the IEEE Pedestrian-A channel, with $N_T=4$, $N_R=2$.  The channel matrices $\bH_{i,t}$ are generated using Jake's model for realistic simulations, from the IT++ library through the python wrapper py-itpp \cite{ViditPy}. 
 We compare the results obtained by our framework, with the work presented in \cite{6891198}, which also utilized temporal correlations for predictive quantization.
-The forward prediction function $f_P$ of the proposed framework, has $p$ (Section \ref{section2}) to be $1$ \eqref{fpqp}, whereas the backward pass $p$ for time instant $t$ is $t$ (Observe the framing of $\mathcal{O}_{i,t}$).   
+% The forward prediction function $f_P$ of the proposed framework, has $p$ (Section \ref{section2}) to be $1$ \eqref{fpqp}, whereas the backward pass $p$ for time instant $t$ is $t$ (Observe the framing of $\mathcal{O}_{i,t}$).   
 We keep $p=4$ for the $f_P$ presented in \cite{6891198}.
 The quantization function $q_P$ is kept to be same, as described in \cite{6545375,6891198,Gupt1905:Predictive} for both the approaches.
 Although in both our work and \cite{6891198}, only temporal correlations are exploited, we compare the BER, quantization error and achievable rate results for the complete MIMO-OFDM setting with $N=64$ of subcarriers, and channels are fed back for $8$ evenly spaced subcarriers, indexed starting at 0, viz. $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$). Hence, the feedback is available only for $i=\{9k\}$ subcarriers (i.e. transmitter obtains only $\text{fb}_{\{9k\},t}$).
@@ -447,47 +453,47 @@ The bit budget per OFDM frame is thus 48 bits, for total 8 equally spaced fed ba
 
 For predicting channels at each of the $8$ fed-back subcarriers, we consider $8$ separate reservoirs, each of them evolved separately, with $i\in\{9k, k \in \{0,1,\ldots,7\}\}$ in both the forward pass prediction and quantization ($f_P,q_P$) \eqref{fpqp} and backward pass to update $\bW_{i,t}^{\text{out}}$ \eqref{backpass}. Unlike \cite{Gupt1905:Predictive}, we do not exploit frequency correlations for predictive quantization, and the $8$ reservoirs for prediction of $8$ fed-back subcarriers are kept independent of each other.
 All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Reny\"i graph, with probability of edge connections being $0.2$, $\lambda=2$, $\bW^{\text{out/in}}_{i\in\{9k\},0}$ are initialized randomly, and $D_{\text{in}}=D_{\text{out}}=14$ (vectorized representation of $4\times2$ semi-unitary matrix, Section \ref{vectorize}) and $D_{\text{resv}}=60$.
-
+% All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Reny\"i graph, with 
 \begin{figure}
 \centering
 \includegraphics[width=0.5\textwidth]{images/table.pdf}
 \caption{The transmitter obtains feedback for $\{0,9,\ldots,63\}$ ($\{9k, k \in \{0,1,\ldots,7\}\}$ subcarriers, and uses $\tilde{\bU}_{i,t-1}$, along with $f_P,q_P$ \eqref{fpqp} to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley method to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ subcarriers.}
 \label{table}
-\vspace{-8pt}
+\vspace{5pt}
 \end{figure}
 
 \subsection{Quantization error, BER and Achievable Rate Results}
 \label{res}{}
 % To mitigate errors in prediction upon the presence of randomly appearing drastic events in wireless channels, such as sudden interferences and dynamic environments, only 100 channel evolutions are considered for the simulations, and the algorithm is re-starte.
 \noindent Averaging is performed over 10 independent channel realizations, to ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile. Therefore, the quantization error, BER and achievable rate results are averaged over 1000 channel instances, with 100 channel evolutions of 10 independent channel realizations.
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.4\textwidth]{images/qtizErr.pdf}
 \caption{Quantization error in terms of chordal distance to the actual precoder $\bU_{\{9k\},t}$ observed at the receiver, from the quantized estimate $\tilde{\bU}_{\{9k\},t}$, averaged over 8 fed back subcarriers ($\{9k, k \in \{0,1,\ldots,7\}\}$) and 10 independent channel realizations (normalized Doppler $f_DT_s=10^{-4}$).}
 \label{qtiz_err}
+\vspace{-10pt}
 \end{figure}
 
 From Fig. \ref{qtiz_err} it is evident that the proposed framework is able to reduce the quantization error below what was obtained from the existing temporal correlations based predictive quantizer in \cite{6891198}. In addition, the quantization error plot is much smoother as well, which can be explained from the fact that the reservoir computing approach optimizes $\mathcal{O}_{i,t}$, that captures the long term dynamics of the channel and hence, does not face jittery variations. We simulate (uncoded QPSK) BER performance for all the 64 subcarriers' precoders obtained after interpolation ($\tilde{\bU}_{i\neq\{9k\},t}$) and quantization ($\tilde{\bU}_{\{9k\},t}$). Observe from Fig. \ref{BER} that reservoir computing framework is able to achieve substantial improvements in $\text{E}_\text{b}\text{N}_0$ levels at $\text{BER}\leq 10^{-4}$. Particularly, for $\text{BER}=10^{-5}$ we observe around $5$ dB improvement. 
 
-We hypothesize that the key reason for the improved performance for both quantization error and BER in the reservoir computing approach, $f_P,q_P$ are coupled via the backward pass framework (explained towards the end of Section \ref{train}). Also, observe from Fig. \ref{BER} that the proposed framework BER curve (yellow) comes very close to the ideal $8$ feedback curve (green). This can be explained due to the fact that the semi-unitary precoder basically rotates the data vector via it's matrix transformation. For QPSK, we get some reasonable error margin for this rotation, which becomes more stringent as the simulated BER is reduced. Hence, we match the ideal curve for high BER region, and for low BER region, as the margin of error reduces, the curves diverge.
+We hypothesize that the key reason for the improved performance for both quantization error and BER in the reservoir computing approach, is the fact that $f_P,q_P$ are coupled via the backward pass framework (explained towards the end of Section \ref{train}). Also, observe from Fig. \ref{BER} that the proposed framework BER curve (yellow) comes very close to the ideal $8$ feedback curve (green). This can be explained due to the fact that the semi-unitary precoder basically rotates the data vector via its matrix transformation. For QPSK, we get some reasonable error margin for this rotation, which becomes more stringent as the simulated BER is reduced. Hence, we match the ideal curve for high BER region, and for low BER region, as the margin of error reduces, the curves diverge.
 
 \noindent For simulating the achievable rate, we quantize the sigma values ($\Sigma_{i,t}$ from SVD of $\bH_{i,t}$) using a 2 bit vector quantizer ($k$-means), and feed them back to the transmitter for fed back subcarriers ($\{9k, k \in \{0,1,\ldots,7\}\}$). For the non-fed back subcarriers, they are interpolated via a simple convex combination interpolation method as in \cite{Gupt1905:Predictive}. Observe from Fig. \ref{achievrate} that the reservoir computing framework offers improvement in achievable rate for $f_DT_s=10^{-4}$. Since the temporal variations for $f_DT_s=10^{-2}, 10^{-1}$ are higher, the reservoir computing framework has to learn a faster-varying function, and hence the degradation in performance. However, it still matches the performance of the predictive quantizer in \cite{6891198} for $f_DT_s=10^{-2}$ and performs slightly better for $f_DT_s=10^{-1}$.
 \vspace{-3pt}
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.44\textwidth]{images/BER_res.pdf}
 \caption{BER results: Here, red curve is the most ideal case considering exact $\bU_{i,t}$ for all 64 subcarriers, at each time instant are available at the transmitter. The \{green/yellow/blue\} curves corresponds to the case in which \{$\bU_{9k,t}$/$\tilde{\bU}_{9k,t}$ from reservoir method/$\tilde{\bU}_{9k,t}$ from \cite{6891198}\} is available for each time instant, and non fed back precoders are interpolated via Cayley method. Observe that the proposed framework BER curve (provides significant improvement in $\text{E}_\text{b}\text{N}_0$ levels over the work presented in \cite{6891198} (blue).}
 \label{BER}
-\vspace{-5pt}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includegraphics[width=0.44\textwidth]{images/hopRate.pdf}
 \caption{The results are presented as a percentage of the ideal achievable rate obtained when the transmitter has the accurate (unquantized) and non-interpolated estimates of $\bU_{i,t}$ for each subcarrier and each time instant.}
 \label{achievrate}
-\vspace{-5pt}
+\vspace{-10pt}
 \end{figure}
 %Qtisn error with 1000 chan evols
 %Qtisn error with 100 chan evols
@@ -495,10 +501,9 @@ We hypothesize that the key reason for the improved performance for both quantiz
 %Achievable rat
 \section{Conclusions and Future Work}
 \label{section5}
-\vspace{-3pt}
-In this paper, we have presented a reservoir computing framework for temporal-correlations based predictive quantization of SVD precoders.
-The simulations reveal significant improvement in quantization error and BER, along with an increase in achievable rate for IEEE Pedestrian-A channel model with normalized Doppler $f_DT_s=10^{-4}$.
-This motivates further study into the framework, and future work would involve generalization of the framework to capture temporal-frequency correlations jointly for predictive quantization, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
+In this paper, we have presented a reservoir computing framework for temporal correlations based predictive quantization of SVD precoders.
+The simulations reveal significant improvement in quantization error and BER, along with an increase in achievable rate for IEEE Pedestrian-A channel model with normalized Doppler, $10^{-4}$.
+This motivates further study into the framework, and future work would involve generalization of the framework to capture temporal-frequency correlations jointly (as presented in \cite{Gupt1905:Predictive}) for predictive quantization, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
 The reservoir computing framework can also be used to predict the future precoders at the receiver, to mitigate issues caused by delay in feedback, on the lines of \cite{chang2011adaptive}, which forms another interesting path for future enhancements.
 \vspace{-5pt}
 
