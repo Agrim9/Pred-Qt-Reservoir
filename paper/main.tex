@@ -124,7 +124,7 @@
 \begin{document}
 %Here goes the title
 
-\title{Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework}
+\title{Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework \vspace{-10pt}}
 
 
 %Authors List
@@ -132,7 +132,7 @@
  \author{\authorblockN{Agrim Gupta, Pranav Sankhe, Kumar Appaiah, Manoj Gopalkrishnan}
  \
  \authorblockA{Department of Electrical Engineering, Indian Institute of Technology Bombay\\
- \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in}
+ \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in \vspace{-15pt}}
 % \thanks{Parts of this work was supported by the Bharti Centre for Communication in
 % IIT Bombay, and the Visvesvaraya
 % PhD Scheme of Ministry of Electronics \& Information Technology,
@@ -191,8 +191,9 @@ Simulations reveal that this approach produces reduced quantization error, which
 \end{abstract}
 
 
-
+\vspace{-6pt}
 \section{Introduction}
+\vspace{-6pt}
 \label{intro}
 % Broad summary of your work, come to your problem definition.
 % Can remove MIMO wireless systems
@@ -234,7 +235,6 @@ In our work, we utilize a RC framework to capture the underlying nonlinear relat
 \label{section2}
 We consider a $N_T\times N_R$ MIMO-OFDM wireless system with $N$ subcarriers, and assume $N_T > N_R$ and $N_s = N_R$.
 Consistent with notation in \cite{6891198,Gupt1905:Predictive}, the data stream received on the $i$-th subcarrier, $t$-th time instant (or the $t$-th OFDM frame) is,
-\vspace{-5pt}
 \begin{equation}
 \by_{i,t}=\bH^{H}_{i,t}\tilde{\bU}_{i,t}\bx_{i,t}+ \bw_{i,t}
 \end{equation}
@@ -272,7 +272,7 @@ Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ 
 % The proposed RC scheme is evaluated against the temporal predictive quantization scheme in \cite{6891198}, and the simulation results are discussed in Section \ref{section4}.
 
 %Explain prediction and quantization steps here itself ! (succintly)
-\section{Reservoir Framework for Predictive Quantization}
+\section{Reservoir Framework for Pred. Qtizn.}
 \label{section3}
 \subsection{Vectorizing matrices in the Stiefel Manifold}
 \label{vectorize}
