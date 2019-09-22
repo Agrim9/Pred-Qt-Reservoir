@@ -124,7 +124,7 @@
 \begin{document}
 %Here goes the title
 
-\title{\vspace{-10pt}Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework \vspace{-17pt}}
+\title{\vspace{-10pt}Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework \vspace{-10pt}}
 
 
 %Authors List
@@ -231,14 +231,17 @@ RC has been successfully used to solve problems like handwritten digit image rec
 \cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
 In our work, we utilize a RC framework to capture the underlying nonlinear relations between the previously fed back precoders and the precoder at next time instant, for predictive quantization. This becomes analogous to time series prediction algorithms, for which the RC framework has been cited to work effectively \cite{mosleh2017brain}.
 
-\vspace{-3pt}
+\vspace{-1pt}
 \section{System Model}
 \label{section2}
+\vspace{-1pt}
 We consider a $N_T\times N_R$ MIMO-OFDM wireless system with $N$ subcarriers, and assume $N_T > N_R$ and $N_s = N_R$.
 Consistent with notation in \cite{6891198,Gupt1905:Predictive}, the data stream received on the $i$-th subcarrier, $t$-th time instant (or the $t$-th OFDM frame) is,
+\vspace{-1pt}
 \begin{equation}
 \by_{i,t}=\bH^{H}_{i,t}\tilde{\bU}_{i,t}\bx_{i,t}+ \bw_{i,t}
 \end{equation}
+\vspace{-1pt}
 Here, $\tilde{\bU}_{i,t} \in \mathbb{C}^{N_T \times N_R}$ is the quantized estimate of precoding matrix, $\by_{i,t} \in \mathbb{C}^{N_R \times 1}$ is the received data stream, $\bx_{i,t} \in \mathbb{C}^{N_T \times 1}$ denotes the transmitted signal, $\bH_{i,t} \in \mathbb{C}^{N_T \times N_R}$ denotes the point-to-point MIMO channel matrix and $\bw_{i,t}$ denotes the i.i.d. complex Gaussian noise with $\bw_{i,t} \sim \mathcal{N}_{\mathbb{C}}(0,N_0\bI_{N_R})$, $N_0$ being the noise variance. For this work, we assume that $\bH^{H}_{i,t}$ is estimated exactly, with zero error at the receiver.
 
 % Tell that if infinite bit budget available, transmitter can directly use matrices obtained from SVD as precoders. However, since this is not the case we have to quantize (N dimensional) manifold, incurring substantial quantization error. Independent quantization techniques (references). Predictive quantization techniques can be used on the top of independently initialized values to improve the error. This is done in a way intuitively similar to Delta PCM, in which quantization error is reduced substanitally by using a linear predictor and quantizing the difference between the predicted and observed value. Since these preocders lie on Stiefel manifold, linear schemes will not work, due to non linearity of the manifold. However,past work has generalized the ideas to the manifold by exploiting the differential geometry of the manifold. Once a prediction is obtained, one has to quantize only the difference between the prediction and the observed value, which allows for improved quantization error. As the prediction becomes closer to the original value, the quantization error also decreases. The quantization algorithm is illustrated in Section 3.3
@@ -275,8 +278,8 @@ Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ 
 %Explain prediction and quantization steps here itself ! (succintly)
 \section{Reservoir Framework for Pred. Qtizn.}
 \label{section3}
-\subsection{Vectorizing matrices in the Stiefel Manifold}
-\label{vectorize}
+% \subsection{Vectorizing matrices in the Stiefel Manifold}
+% \label{vectorize}
 The RC framework has inputs and outputs as real vectors, and thus, it is necessary to convert the precoding matrices to vectors.
 A precoding matrix $\mathcal{\bM} \in \text{St}(N_T,N_R)$ is a $\mathbb{C}^{N_T \times N_R}$ matrix with the property $\mathcal{\bM}^H\mathcal{\bM}=\text{\textbf{1}}_{N_R}$.
 For brevity, we call such a matrix $\mathcal{\bM}$ a `semi-unitary' matrix.
@@ -294,9 +297,7 @@ Therefore, we vectorize a $\mathbb{C}^{N_T \times N_R}$ semi-unitary matrix $\ma
  % Hence, we vectorize a semi-unitary $\mathbb{C}^{N_T \times N_R}$ $\mathcal{\bM}$ into $2N_TN_R-N_R^2+N_R$ dimensional vector, denoted as $\bm$.
 %Focus on the fact that you don't actually pay a penalty
 %The thing to quantize remains on the Stiefel Manifold
-\subsection{Forward Prediction $f_P$}
-\noindent The vector representation of semi-unitary matrices allows to proceed with our discussion on RC framework.
-Consider the RC framework in Fig. \ref{res_overview} %Ref Fig. Reservoir Pic
+% \subsection{Forward Prediction $f_P$}
 
 The input to the reservoir $i$ that corresponds to subcarrier $i$ is $\tilde{\bu}_{i,t-1}$ (vectorized representation of $\tilde{\bU}_{i,t-1}$), with dimensions $D_{\text{in}}=2N_TN_R-N_R^2+N_R$.
 Using a randomly initialized $D_{\text{resv}}\times D_{\text{in}}$ input coupler matrix $\bW^{\text{in}}_i$, the $D_{\text{in}}$ dimensional input is mapped to a $D_{\text{resv}}(>>D_{\text{in}})$ dimensional vector, where $D_{\text{resv}}$ is the dimension of the reservoir state vector $\br_{i,t}$. $\br_{i,t}$ is initialized with $D_{\text{resv}}$ zeros, and is updated via the following equation:
@@ -305,52 +306,51 @@ Using a randomly initialized $D_{\text{resv}}\times D_{\text{in}}$ input coupler
 \label{res_upd}
 \end{equation}
 where $\bA_i$ is the adjacency matrix that captures the reservoir dynamics, and $\text{tanh}$ is applied element wise.
-Typical choices for $\bA_i$ have been Erdos-Renyi graphs with an upper bounded maximum eigenvalue \cite{mosleh2017brain,pathak2017using}. The output of the reservoir is $\bp_{i,t}$, a vectorized representation of $\bP_{i,t}$, which denotes the predicted precoder at $i$-th subcarrier, $t$-th time instant.
+Typical choices for $\bA_i$ have been Erdos-Renyi graphs with an upper bounded maximum eigenvalue \cite{mosleh2017brain,pathak2017using}. The output of the reservoir is $\bp_{i,t}$ (vectorized representation of $\bP_{i,t}$), which denotes the predicted precoder at $i$-th subcarrier, $t$-th time instant.
 Therefore, the output of the reservoir is also a $D_{\text{in}}$ dimensional vector (viz. $D_{\text{out}}=D_{\text{in}}$).
-The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoir state $\br_{i,t}$ with the $D_{\text{out}}\times D_{\text{resv}}$ output coupler matrix $\bW^{\text{out}}_{i,t-1}$,
+The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoir state $\br_{i,t}$ with $D_{\text{out}}\times D_{\text{resv}}$ output coupler matrix $\bW^{\text{out}}_{i,t-1}$, which forms the prediction function $f_P(\cdot)$ with $\tilde{\bU}_{i,t-1}$ as its argument, for the RC framework
 \begin{equation}
-\bp_{i,t}=\bW^{\text{out}}_{i,t-1}\br_{i,t}
+\bp_{i,t}=\bW^{\text{out}}_{i,t-1}\br_{i,t}=f_P(\tilde{\bU}_{i,t-1})
 \label{pred_op}
 \end{equation}
+
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{images/system2.pdf}
 % \caption{System Overview: The RC framework takes the precoder estimate at $t-1$ (viz. $\tilde{\bu}_{i,t-1}$) as input, and executes the forward pass of the predictive quantization framework, shaded in green, to obtain $\tilde{\bu}_{i,t}$. Both the transmitter and receiver utilize the same reservoir (initialized identically), with a minute difference indicated by the cyan shaded block. In the cyan shaded block, receiver finds the appropriate codeword for the $q_P$ function by comparing the prediction with the actual $\bU_{i,t}$, and communicates $\text{fb}_{i,t}$ to allow estimation of $\tilde{\bu}_{i,t}$ at the transmitter. Then, both the receiver and transmitter execute the backward pass (shaded in blue) to optimize $\mathcal{O}_{i,t}$ \eqref{oit}, to ensure identical evolution of both the reservoirs}
-\caption{Forward Prediction (Green): Both the transmitter and receiver utilize identical reservoirs and quantized precoder estimate at $t-1$ (i.e. $\tilde{\bu}_{i,t-1}$, top left of figure) to obtain $\bP_{i,t}$ via \eqref{fwd_pred}. The transmitter estimates the quantized precoder at $t$ (i.e. $\tilde{\bu}_{i,t}$, top right of figure) using receiver feedback $\text{fb}_{i,t}$ via $q_P$ \eqref{eqn:cn2}. 
-\\Feedback Estimation (Cyan): The Receiver estimates the ideal $\text{fb}_{i,t}$ using the exact precoders $\bU_{i,t}$ via \eqref{eqn:cn1}. The transmitter observes only the feedback $\text{fb}_{i,t}$\\ Backward Pass (Blue): $\bW^{\text{out}}_{i,t}$ is updated via \eqref{wout_upd} for optimizing $\mathcal{O}_{i,t}$. This is done at both transmitter and receiver to ensure identical evolution of the reservoirs} 
+\caption{RC Framework Overview: Forward Prediction (Green): Both TX and RX utilize identical RCs and quantized precoder estimate at $t-1$ (i.e. $\tilde{\bu}_{i,t-1}$, top left of fig.) to obtain $\bP_{i,t}$ via \eqref{pred_op}. The transmitter estimates the quantized precoder at $t$ (i.e. $\tilde{\bu}_{i,t}$, top right of fig.) using receiver feedback $\text{fb}_{i,t}$ via $q_P$ \eqref{eqn:cn2}. 
+\\Feedback Estimation (Cyan): The Receiver estimates the ideal $\text{fb}_{i,t}$ using the exact precoders $\bU_{i,t}$ via \eqref{eqn:cn1}. The transmitter observes only the feedback $\text{fb}_{i,t}$\\ Backward Pass (Blue): $\bW^{\text{out}}_{i,t}$ is updated via \eqref{wout_upd} for optimizing $\mathcal{O}_{i,t}$. This is done at both TX and RX to ensure identical evolution of the reservoirs} 
 \label{res_overview}
 \vspace{-5pt}
 \end{figure*}
-This completes the forward prediction to obtain $\bP_{i,t}$ using only the past observed $\bU_{i,t-1}$ (i.e. $p=1$, Section \ref{section2}). That is,
-\begin{equation}
-\bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_{i,t-1}\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For brevity, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
-\label{fwd_pred}
+% \begin{equation}
+% \bP_{i,t}=f_P(\tilde{\bU}_{i,t-1})=\bW^{\text{out}}_{i,t-1}\text{tanh}(\bA_i\br_{i,t-1}+\bW^{\text{in}}_i\tilde{\bu}_{i,t-1})\footnote{For brevity, $\bp_{i,t}$ and $\bP_{i,t}$ are treated to be one and the same}
+% \label{fwd_pred}
+% \end{equation}
+% However, a complete discussion of the framework involves a backward pass for reservoir training, which estimates optimum $\bW^{\text{out}}_{i,t}$. This would follow subsequently after $q_P(\cdot)$ is described.
+
+We now describe the quantization function $q_P(\cdot)$ which is essentially the same as considered in \cite{Gupt1905:Predictive,6891198}, that exploits the fact that tangent spaces local to a point in manifold are vector spaces. To do so, the quantization algorithm quantizes the local tangent space at the predicted precoder $\bP_{i,t}$ to get a codebook, $T^\mathcal{C}$ having $2^{\mathcal{B}}$ codeword tangents in the tangent space. The quantized precoders are obtained by traversing along the `codeword tangents' from the predicted precoder $\bP_{i,t}$, using a retraction map (denoted by $\text{retract}(\cdot)$). The receiver conveys the feedback $\text{fb}_{i,t}$ to the transmitter, which minimizes the chordal distance metric ($d_s(\bX,\bY)$ for $\bX,\bY \in \text{St}(N_T,N_R)$ detailed in \cite{Gupt1905:Predictive,6891198}) between the quantized precoders and the ideal precoder $\bU_{i,t}$ estimated from SVD of $\bH_{i,t}$ \eqref{eqn:cn1}
+ \begin{equation}
+\label{eqn:cn1}
+\text{fb}_{i,t} \gets \text{argmin}_{i \in \{1,2,\ldots,2^{\mathcal{B}}\}}\left (d_s\left (\bU_{i,t},\text{retract}(\bP_{i,t},T^\mathcal{C}[i])\right ) \right)
 \end{equation}
-However, a complete discussion of the framework involves a backward pass for reservoir training, which estimates optimum $\bW^{\text{out}}_{i,t}$. This would follow subsequently after $q_P(\cdot)$ is described.
-\subsection{Quantization function $q_P$}
-\label{qp}
-We now describe the quantization function $q_P(\bP_{i,t},\text{fb}_{i,t})$, which is similar to the schemes used in \cite{6891198,Gupt1905:Predictive,6545375}.
-Central to the quantization algorithm is the fact that tangent spaces local to a point in manifold are vector spaces.
+The transmitter utilizes the above quantization function $q_P$ to obtain $\tilde{\bU}_{i,t}=q_P(\bp_{i,t},\text{fb}_{i,t})$ from $\bp_{i,t},\text{fb}_{i,t}$.
+\begin{equation}
+\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=\text{retract}(\bP_{i,t},T^\mathcal{C}[\text{fb}_{i,t}])
+\label{eqn:cn2}
+\end{equation}
 % Given two points $\bX$ and $\bY$ in $\text{St}(N_T,N_R)$, a lifting operation $\bT^Y_X=\texttt{lift}(\bX,\bY)$, $\texttt{lift}:\text{St}(N_T,N_R)\times \text{St}(N_T,N_R) \to \mathcal{T}_X \text{St}(N_T,N_R)$ yields a tangent from $X$ to $Y$, denoted as $\bT^Y_X \in \mathcal{T}_X \text{St}(N_T,N_R)$, where $\mathcal{T}_X \text{St}(N_T,N_R)$ is the local tangent space at $\bX$.
 % A corresponding retraction operation $Y=\texttt{retract}(X,\bT^Y_X)$, $\texttt{retract}: \text{St}(N_T,N_R)\times \mathcal{T}_X \text{St}(N_T,N_R) \to \text{St}(N_T,N_R)$ gives back the manifold point obtained by traversing in the tangent direction given by the second argument ($\bT^Y_X$).
 % In this work, the chosen lifting-retraction pairs are the Cayley exponentials, discussed in \cite{DBLP:journals/corr/abs-1708-00045,Gupt1905:Predictive}. % and used in \cite{Gupt1905:Predictive}.
 % The Cayley exponential lifting operation maps two points in $\text{St}(N_T,N_R)$, to a $N_T\times N_T$ skew Hermitian matrix that represents the tangent from first point to the other.
 
-The quantization algorithm exploits the vector space property of the tangent space and quantizes the local tangent space at the predicted precoder $\bP_{i,t}$, viz $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$.
 % The codebook for $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$ corresponds to a collection of $\mathcal{B}-1$ codewords that represent the different directions (tangents) in $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$.
 % This codebook is subsequently referred to as the base codebook ($\text{base}^{\mathcal{C}}$) for the quantization function.
-The feedback from the receiver indicates the codeword corresponding to the optimum tangent in $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$, which the transmitter can choose to get closest (in terms of chordal distance metric, $d_s(\bX,\bY)$ for $\bX,\bY \in \text{St}(N_T,N_R)$ detailed in \cite{Gupt1905:Predictive,6891198}) to the actual value $\bU_{i,t}$.
-With the optimum direction chosen, the next step is to determine how much to move in that particular chosen direction, viz. the length of the chosen tangent direction. For this, we adopt the strategy in \cite{6891198}, which controls the magnitude of tangent steps, by having two codebooks of different spreads, but the same $2^{\mathcal{B}-1}$ base vectors.
+% The feedback from the receiver indicates the codeword corresponding to the optimum tangent in $\mathcal{T}_{\bP_{i,t}} \text{St}(N_T,N_R)$, which the transmitter can choose to get closest (in terms of chordal distance metric, $d_s(\bX,\bY)$ for $\bX,\bY \in \text{St}(N_T,N_R)$ detailed in \cite{Gupt1905:Predictive,6891198}) to the actual value $\bU_{i,t}$.
+% With the optimum direction chosen, the next step is to determine how much to move in that particular chosen direction, viz. the length of the chosen tangent direction. For this, we adopt the same strategy in \cite{,Gupt1905:Predictive,6891198}, which controls the magnitude of tangent steps, by having two codebooks of different spreads, but the same $2^{\mathcal{B}-1}$ base vectors.
 % The two codebooks are concatenated to form a $2^\mathcal{B}$ length codebook, $T^\mathcal{C}$.
 % The receiver finds the optimal index $\text{fb}_{i,t} \in \{1,2,\ldots,2^{\mathcal{B}}\}$ in $T^\mathcal{C}$ by comparing the chordal distance metric ($d_s$), of each codeword to the actual precoder $\bU_{i,t}$ obtained from the SVD of the channel matrix, using \eqref{eqn:cn1}. The receiver then feeds back $\text{fb}_{i,t}$ to the transmitter using $\mathcal{B}$ bits. The transmitter uses the fed back $\text{fb}_{i,t}$ and \eqref{eqn:cn2} to calculate $\tilde{\bU}_{i,t}$,
-% \begin{equation}
-% \label{eqn:cn1}
-% \text{fb}_{i,t} \gets \text{argmin}_{i \in \{1,2,\ldots,2^{\mathcal{B}}\}}\left (d_s\left (\bU_{i,t},\text{retract}(\bP_{i,t},T^\mathcal{C}[i])\right ) \right)
-% \end{equation}
-% \begin{equation}
-% \tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=\text{retract}(\bP_{i,t},T^\mathcal{C}[\text{fb}_{i,t}])
-% \label{eqn:cn2}
-% \end{equation}
+
 % $\text{fb}_{i,t}$ is also used to update the spread of the codebooks $T^{\mathcal{C}}_p,T^{\mathcal{C}}_m$.
 % Depending on whether $\text{fb}_{i,t} \geq 2^{\mathcal{B}-1}$, i.e. whether the optimum codeword is in $T^{\mathcal{C}}_p$ or $T^{\mathcal{C}}_m$, the scale parameter $s[k]$, which in turn controls values of $s_p, s_m$, is updated as,
 % $$s_p=g^{\text{min}(s[k-1]+1,0)}, s_m = g^{s[k-1]-1}$$
@@ -364,12 +364,12 @@ With the optimum direction chosen, the next step is to determine how much to mov
 % with $s[0]=0$.
 % Intuitively, the algorithm reduces/increases the spread of the codebook till the reduction/increase of spread is no longer beneficial, i.e. the optimum codeword lies in the higher/lower spread codebook instead.
 % The scheme used to obtain $\text{base}^{\mathcal{C}}$ is similar to the one presented in \cite{Gupt1905:Predictive}, which performs a $k$-means ($k=2^{\mathcal{B}-1}$) clustering on a collection of tangents to obtain an isotropic collection of $2^{\mathcal{B}-1}$ tangent codewords.
-This completes the discussion on the quantization function $q_P$ to obtain $\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})$ from $\bP_{i,t},\text{fb}_{i,t}$.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % More information needed about the adjacency
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Reservoir Training Procedure, the backward pass}
-\label{train}
+% \subsection{Reservoir Training Procedure, the backward pass}
+% \label{train}
 \noindent Having described the technicalities of $f_P,q_P$, we now describe the training process for the reservoir, which couples $f_P$ with $q_P$.
 Recall that, to obtain $\tilde{\bU}_{i,t}$ from  $\tilde{\bU}_{i,t-1}$, we have
 \begin{equation}
