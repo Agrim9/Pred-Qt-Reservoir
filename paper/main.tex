@@ -124,7 +124,7 @@
 \begin{document}
 %Here goes the title
 
-\title{Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework \vspace{-10pt}}
+\title{\vspace{-10pt}Predictive Quantization for MIMO-OFDM SVD Precoders using Reservoir Computing Framework \vspace{-17pt}}
 
 
 %Authors List
@@ -132,7 +132,7 @@
  \author{\authorblockN{Agrim Gupta, Pranav Sankhe, Kumar Appaiah, Manoj Gopalkrishnan}
  \
  \authorblockA{Department of Electrical Engineering, Indian Institute of Technology Bombay\\
- \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in \vspace{-15pt}}
+ \{agrim,pranavs,akumar,manojg\}@ee.iitb.ac.in \vspace{-18pt}}
 % \thanks{Parts of this work was supported by the Bharti Centre for Communication in
 % IIT Bombay, and the Visvesvaraya
 % PhD Scheme of Ministry of Electronics \& Information Technology,
@@ -159,6 +159,7 @@
   % which were not fed back. We demonstrate significant improvements in
   % both BER curve and log-sum rate capacity over the existing
   % approaches.
+
 \begin{abstract}
 
   % Precoding transmissions in wireless MIMO systems is essential to
@@ -177,7 +178,6 @@
   % significant improvement in achievable rate as well as BER reduction
   % when compared to existing strategies.
 
-
 SVD based precoding matrices have been theoretically proven to perform optimum power allocation and lower BER transmissions in MIMO wireless systems. 
 % A key step enabling this improved performance is the feedback of these precoders to the transmitter from the receiver.
 % Gievn the limited bit budget for such Channel State Information (CSI) feedback, these precoders need to be quantized effectively using just a few bits.
@@ -191,21 +191,21 @@ Simulations reveal that this approach produces reduced quantization error, which
 \end{abstract}
 
 
-\vspace{-6pt}
+\vspace{-5pt}
 \section{Introduction}
-\vspace{-6pt}
+\vspace{-5pt}
 \label{intro}
 % Broad summary of your work, come to your problem definition.
 % Can remove MIMO wireless systems
-In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ data stream onto an $N_T$-dimensional transmit vector that corresponds to the signal emanating from the $N_T$ transmit antennas.
+In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ data stream onto an $N_T$-dimensional transmit signal.
 The precoding matrix used to maximize the achievable rate using optimal power allocation is obtained via the SVD of the MIMO channel matrix \cite{love2008overview}.
 However, since the MIMO channel matrix is estimated at the receiver, the transmitter requires receiver feedback for optimal precoding.
 Therefore, the receiver needs to quantize and feed back the precoders while respecting the bit budget imposed by limited feedback schemes.
 Given the high dimensionality of precoders (which form a $N_T \times N_R$ complex-valued matrix, viz. $2N_TN_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
-Past work has used two inherent properties of the precoders to enable effective quantization with just a few bits.
-First, the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with lower dimensions, when performing operations over the manifold directly \cite{pitaval2013codebooks}.
+Past work has used two inherent properties of the optimal precoders to enable effective quantization with just a few bits.
+First, the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with effective lower dimensions, when performing operations over the manifold directly \cite{pitaval2013codebooks}.
 Second, these precoders are correlated in both time and frequency \cite{Gupt1905:Predictive}.
 Utilizing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
 This improvement is obtained because of feeding back just the small extra information needed on top of the past fed back precoders, as compared to the new precoder information in the entirety.
@@ -231,6 +231,7 @@ RC has been successfully used to solve problems like handwritten digit image rec
 \cite{mosleh2017brain,shafin2018realizing} utilized the framework for OFDM symbol detection while accounting for channel and power amplifier non-linearities.
 In our work, we utilize a RC framework to capture the underlying nonlinear relations between the previously fed back precoders and the precoder at next time instant, for predictive quantization. This becomes analogous to time series prediction algorithms, for which the RC framework has been cited to work effectively \cite{mosleh2017brain}.
 
+\vspace{-3pt}
 \section{System Model}
 \label{section2}
 We consider a $N_T\times N_R$ MIMO-OFDM wireless system with $N$ subcarriers, and assume $N_T > N_R$ and $N_s = N_R$.
