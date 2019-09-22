@@ -370,13 +370,7 @@ The transmitter utilizes the above quantization function $q_P$ to obtain $\tilde
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \subsection{Reservoir Training Procedure, the backward pass}
 % \label{train}
-\noindent Having described the technicalities of $f_P,q_P$, we now describe the training process for the reservoir, which couples $f_P$ with $q_P$.
-Recall that, to obtain $\tilde{\bU}_{i,t}$ from  $\tilde{\bU}_{i,t-1}$, we have
-\begin{equation}
-\tilde{\bU}_{i,t}=q_P(\bP_{i,t},\text{fb}_{i,t})=q_P(f_P(\tilde{\bU}_{i,t-1}),\text{fb}_{i,t})
-\label{fpqp}
-\end{equation}
-The key idea for reservoir training is that, as the predicted matrix $\bP_{i,t}$ (the coarse estimate) gets closer to $\tilde{\bU}_{i,t}$ (the refined estimate), the receiver has to quantize even smaller subspaces, and can thus provide a more refined estimate from the feedback $\text{fb}_{i,t}$.
+\noindent Having described the technicalities of $f_P,q_P$, we now describe the training process for the reservoir, which couples $f_P$ with $q_P$. The key idea for reservoir training is that, as the predicted matrix $\bP_{i,t}$ (the coarse estimate) gets closer to $\tilde{\bU}_{i,t}$ (the refined estimate), the receiver has to quantize even smaller subspaces, and can thus provide a more refined estimate from the feedback $\text{fb}_{i,t}$.
 Hence, we train the reservoir output coupler such that the following objective function is optimized:
 \begin{equation}
 \mathcal{O}_{i,t}=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\bp_{i,t}-\tilde{\bu}_{i,t}||^2=\sum_{s=1}^{t}\frac{1}{\lambda^{t-s}}||\bW_{i,t}^{\text{out}}\br_{i,t}-\tilde{\bu}_{i,t}||^2
@@ -401,8 +395,7 @@ Observe that
 \label{wout_upd}
 \end{equation}
 \eqref{wout_upd} makes training of the reservoir easy to implement with low complexity.
-We only need to store a matrix $\text{\textbf{num}}_{i,t-1}$, and a number $\text{den}_{i,t-1}$. Then, using the current reservoir state $\br_{i,t}$ and $\tilde{\bu}_{i,t}$ obtained from \eqref{res_upd}, \eqref{fpqp} respectively, optimum $\bW_{i,t}^{\text{out}}$ can be estimated. The optimum $\bW_{i,t}^{\text{out}}$ can then be used to obtain $\tilde{\bP}_{i,t+1}$, and so on.
-This completes the discussion of the proposed RC framework illustrated in Fig. \ref{res_overview}.
+We only need to store a matrix $\text{\textbf{num}}_{i,t-1}$, and a number $\text{den}_{i,t-1}$ from $t-1$ time instant to calculate optimum output coupler for $t$-th time instant. This completes the discussion of the proposed RC framework (Fig. \ref{res_overview}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -512,9 +505,8 @@ We hypothesize that the key reason for the improved performance for both quantiz
 \label{section5}
 
 In this paper, we have presented a reservoir computing framework for predictive quantization of SVD precoders by exploiting temporal correlations.
-The simulations reveal significant improvement in quantization error, BER, and achievable rate for IEEE Pedestrian-A channel model with normalized Doppler $10^{-4}$. 
+The simulations reveal significant improvement in quantization error, BER, and achievable rate.
 The novelty that enables these improvements lies in the training method for the reservoir framework, which refines the predicted coarse estimates as the reservoir evolves.
-The simulation results indicate that the proposed framework would be able to communicate at significantly lower power levels for the same BER, as illustrated in Fig. \ref{BER}.
 Note that these results have been obtained by exploiting just the temporal correlations for predictive quantization, and can potentially improve if temporal-frequency correlations are exploited jointly.
 This motivates further study into the reservoir framework, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
 \vspace{-4pt}
