@@ -199,7 +199,7 @@
 \label{intro}
 % Broad summary of your work, come to your problem definition.
 % Can remove MIMO wireless systems
-In MIMO wireless systems, precoding matrices are used for transformation of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ data stream onto an $N_T$-dimensional transmit signal.
+In MIMO wireless systems, precoding matrices are used to transform of an $N_S$-dimensional ($N_S \leq \text{min}(N_T,N_R))$ data stream onto an $N_T$-dimensional transmit signal.
 The precoding matrix used to maximize the achievable rate using optimal power allocation is obtained via the SVD of the MIMO channel matrix \cite{love2008overview}.
 However, since the MIMO channel matrix is estimated at the receiver, the transmitter requires receiver feedback for optimal precoding.
 Therefore, the receiver needs to quantize and feed back the precoders while respecting the bit budget imposed by limited feedback schemes.
@@ -268,9 +268,7 @@ In \cite{Gupt1905:Predictive,6891198,6545375}, $\text{fb}_{i,t}$ denotes the cod
 % However, independent quantization algorithms are important for smart initialization (instead of a cold start) of the predictive quantization strategies.
 % Observe that predictive quantization algorithms for SVD precoders are typically the higher dimensional analogues of well known approaches to reduce quantization error using linear prediction codes (LPCs) and Delta PCM.
 % In both LPCs and Delta PCM, quantization error can be reduced substantially using a linear predictor and quantizing the scalar difference between the predicted and observed value (innovation).
-% Analogous to this, for $\text{St}(N_T,N_R)$, quantization error is reduced by quantizing a subspace around the predicted value that is much smaller than the entire manifold.
-
-In our work, we propose a RC framework which implements the prediction function $f_p(\cdot)$.
+% Analogous to this, for $\text{St}(N_T,N_R)$, quantization error is reduced by quantizing a subspace around the predicted value that is much smaller than the entire manifold. In our work, we propose a RC framework which implements the prediction function $f_p(\cdot)$.
 We reuse the $q_P$ algorithm from \cite{Gupt1905:Predictive,6891198}.
 However, by incorporating the $q_P$ in the reservoir framework, $f_P$ and $q_P$ get coupled in the sense that $f_P$ is optimized via online training of the reservoir by minimizing the norm difference between $\bP_{i,t}=f_P(\cdot)$, and $\tilde{\bU}_{i,t}=q_P(f_P(\cdot),\text{fb}_{i,t})$.
 Previous work \cite{Gupt1905:Predictive,6891198} has considered $f_P$ and $q_P$ to be uncoupled with each other.
@@ -467,7 +465,7 @@ All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Re
 \noindent To ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile, we perform averaging over 10 independent channel realizations. Therefore, the quantization error, BER and achievable rate results are averaged over 1000 channel instances, with 100 channel evolutions of 10 independent channel realizations.
 \begin{figure}
 \centering
-\includegraphics[width=0.37\textwidth]{images/qtizErr.pdf}
+\includegraphics[width=0.35\textwidth]{images/qtizErr.pdf}
 \caption{Quantization error in terms of chordal distance to the actual precoder $\bU_{\{9k\},t}$ observed at the receiver, from the quantized estimate $\tilde{\bU}_{\{9k\},t}$ averaged over $\{9k\}$ fed back subcarriers $\Big($ viz. $\frac{\Sigma_{i \in 9k}d_S(\tilde{\bU}_{i,t}, \bU_{i,t})}{8}$ $\Big)$ and 10 independent channel realizations (normalized Doppler $f_DT_s=10^{-4}$).}
 \label{qtiz_err}
 \end{figure}
@@ -481,7 +479,7 @@ We hypothesize that the key reason for the improved performance for both quantiz
 
 \begin{figure}
 \centering
-\includegraphics[width=0.37\textwidth]{images/BER_res.pdf}
+\includegraphics[width=0.35\textwidth]{images/BER_res.pdf}
 \vspace{-5pt}
 \caption{BER results: Here, red curve is the most ideal case considering exact $\bU_{i,t}$ for all 64 subcarriers, at each time instant are available at the transmitter. The \{green/yellow/blue\} curves corresponds to the case in which \{$\bU_{9k,t}$/$\tilde{\bU}_{9k,t}$ from reservoir method/$\tilde{\bU}_{9k,t}$ from \cite{6891198}\} is available for each time instant, and non fed back precoders are interpolated via Cayley method. Observe that the proposed framework BER curve provides significant improvement in $\text{E}_\text{b}\text{N}_0$ levels over \cite{6891198} (normalized Doppler $f_DT_s=10^{-4}$).}
 \vspace{5pt}
@@ -490,7 +488,7 @@ We hypothesize that the key reason for the improved performance for both quantiz
 
 \begin{figure}
 \centering
-\includegraphics[width=0.37\textwidth]{images/hopRate2.pdf}
+\includegraphics[width=0.35\textwidth]{images/hopRate2.pdf}
 \vspace{-5pt}
 \caption{The results are presented as a percentage of the ideal achievable rate obtained when the transmitter has the accurate (unquantized) and non-interpolated estimates of $\bU_{i,t}$ for each subcarrier and each time instant.}
 \label{achievrate}
@@ -504,11 +502,11 @@ We hypothesize that the key reason for the improved performance for both quantiz
 \section{Conclusions and Future Work}
 \label{section5}
 
-In this paper, we have presented a reservoir computing framework for predictive quantization of SVD precoders by exploiting temporal correlations.
-The simulations reveal significant improvement in quantization error, BER, and achievable rate.
-The novelty that enables these improvements lies in the training method for the reservoir framework, which refines the predicted coarse estimates as the reservoir evolves.
-Note that these results have been obtained by exploiting just the temporal correlations for predictive quantization, and can potentially improve if temporal-frequency correlations are exploited jointly.
-This motivates further study into the reservoir framework, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
+We have presented a reservoir computing framework for predictive quantization of MIMO precoders by exploiting temporal correlations.
+Simulations reveal significant improvement in quantization error, BER, and achievable rate.
+The novelty that enables these improvements is the training method for the reservoir framework, which refines the predicted coarse estimates as the reservoir evolves.
+Our results have been obtained by exploiting only temporal correlations for predictive quantization, and can potentially improve if frequency correlations are also exploited simultaneously..
+Future work would focus on better reservoir frameworks, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
 \vspace{-4pt}
 
 % \section{Acknowledgment}
