@@ -206,17 +206,16 @@ Therefore, the receiver needs to quantize and feed back the precoders while resp
 Given the high dimensionality of precoders (which form a $N_T \times N_R$ complex-valued matrix, viz. $2N_TN_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
-Past work has used two inherent properties of the optimal precoders to enable effective quantization with just a few bits.
-First, the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with effective lower dimensions, when performing operations over the manifold directly \cite{pitaval2013codebooks}.
+Past approaches have generally utilized the fact that the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with effective lower dimensions for transformations \cite{pitaval2013codebooks}.
 Second, these precoders are correlated in both time and frequency \cite{Gupt1905:Predictive}.
-Utilizing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
-This improvement is obtained because of feeding back just the small extra information needed on top of the past fed back precoders, as compared to the new precoder information in the entirety.
-% Exploiting frequency correlations permits the use of interpolation algorithms, which reduce the feedback overhead in a single OFDM frame, by feeding back CSI only for certain subcarriers, and interpolating over the others.
-
-Combining the two inherent properties (viz. manifold structure and correlations) to frame manifold based predictive quantization algorithms, require a generalization of various well known linear algorithms for prediction, quantization and interpolation, to the underlying non-linear manifold structure. This is typically done by exploiting the differential geometry of the manifold and relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,krishnamachari2013geometry,chang2011adaptive}. Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
-However, these approaches are non-trivial, since they require specific operations over the non-linear manifold differential geometry.
-In this paper, we aim to capture the above non-linear relations using a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
-The proposed framework offers a simple solution to the predictive quantization problem, which brings about ease of implementation, along with improved performance, when compared to \cite{6891198}, which proposed a corresponding manifold based method to the problem considered in this paper.
+Utilizing the available correlations permit the use of predictive quantization algorithms, which improve the quantization error with time.
+This improvement is obtained because of feeding back only incremental information needed over the past fed back precoders, as compared to the new precoder in its entirety.
+Combining these two inherent properties (viz. manifold structure and correlations) to perform manifold based predictive quantization requires a generalization of various linear algorithms for prediction, quantization and interpolation to the non-linear manifold structure.
+This is typically done by exploiting the differential geometry of the manifold and relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,krishnamachari2013geometry,chang2011adaptive}.
+Such approaches for predictive quantization have provided significant performance benefits, since they operate using lower effective dimensions for prediction and quantization.
+However, these approaches require specific complicated operations over the non-linear manifold differential geometry.
+In this paper, we aim to capture the above non-linear relations using a reservoir computing based predictive quantizer to exploit channel temporal correlations.
+This framework offers a simple solution to the predictive quantization problem that is easy to implement while also improving performance, when compared to corresponding manifold based approach.
 
 % How to we do this
 %\textcolor{blue}
