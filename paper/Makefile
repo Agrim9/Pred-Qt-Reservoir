@@ -1,7 +1,7 @@
 #all: main.pdf
 all: main.pdf
 
-MAINFILES := main.tex $(shell find sections -iname '*tex')
+MAINFILES := main.tex
 
 IMAGEFILES := $(shell find -iname '*svg')
 
