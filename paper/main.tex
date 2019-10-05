@@ -317,8 +317,16 @@ The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoi
 \centering
 \includegraphics[width=0.5\textwidth]{images/system2.pdf}
 % \caption{System Overview: The RC framework takes the precoder estimate at $t-1$ (viz. $\tilde{\bu}_{i,t-1}$) as input, and executes the forward pass of the predictive quantization framework, shaded in green, to obtain $\tilde{\bu}_{i,t}$. Both the transmitter and receiver utilize the same reservoir (initialized identically), with a minute difference indicated by the cyan shaded block. In the cyan shaded block, receiver finds the appropriate codeword for the $q_P$ function by comparing the prediction with the actual $\bU_{i,t}$, and communicates $\text{fb}_{i,t}$ to allow estimation of $\tilde{\bu}_{i,t}$ at the transmitter. Then, both the receiver and transmitter execute the backward pass (shaded in blue) to optimize $\mathcal{O}_{i,t}$ \eqref{oit}, to ensure identical evolution of both the reservoirs}
-\caption{RC Framework Overview: Forward Prediction (Green): Both TX and RX utilize identical RCs and quantized precoder estimate at $t-1$ (i.e. $\tilde{\bu}_{i,t-1}$, top left of fig.) to obtain $\bP_{i,t}$ via \eqref{pred_op}. The transmitter estimates the quantized precoder at $t$ (i.e. $\tilde{\bu}_{i,t}$, top right of fig.) using receiver feedback $\text{fb}_{i,t}$ via $q_P$ \eqref{eqn:cn2}.
-Feedback Estimation (Cyan): The Receiver estimates the ideal $\text{fb}_{i,t}$ using the exact precoders $\bU_{i,t}$ via \eqref{eqn:cn1}. The transmitter observes only the feedback $\text{fb}_{i,t}$\\ Backward Pass (Blue): $\bW^{\text{out}}_{i,t}$ is updated via \eqref{wout_upd} for optimizing $\mathcal{O}_{i,t}$. This is done at both TX and RX to ensure identical evolution of the reservoirs}
+\caption{RC Framework Overview: Forward Prediction (Green):
+  Transmitter and receiver utilize identical RCs and quantized
+  precoder estimate at $t-1$ (i.e. $\tilde{\bu}_{i,t-1}$, top left) to
+  obtain $\bP_{i,t}$ using Equation \eqref{pred_op}. The transmitter
+  estimates the quantized precoder at $t$ (i.e. $\tilde{\bu}_{i,t}$,
+  top right) using feedback $\text{fb}_{i,t}$ via $q_P$
+  \eqref{eqn:cn2}. Feedback Estimation (Cyan): Receiver estimates
+  the ideal $\text{fb}_{i,t}$ using exact precoders $\bU_{i,t}$ using
+  Equation \eqref{eqn:cn1}. The transmitter observes only feedback
+  $\text{fb}_{i,t}$. Backward Pass (Blue): $\bW^{\text{out}}_{i,t}$ is updated using Equation~\eqref{wout_upd} for optimizing $\mathcal{O}_{i,t}$. This is done at both TX and RX to ensure identical evolution of the reservoirs.}
 \label{res_overview}
 \end{figure}
 % \begin{equation}
@@ -445,12 +453,12 @@ Hence, both initialization and subsequent feedback, $\text{fb}_{i,t}$ can be enc
 The bit budget per OFDM frame is thus 48 bits, for total 8 equally spaced fed back subcarriers $\{9k, k \in \{0,1,\ldots,7\}\}$.
 
 For predicting channels at each of the $8$ fed-back subcarriers, we consider $8$ separate reservoirs, each of them evolved separately, with $i\in\{9k, k \in \{0,1,\ldots,7\}\}$ in both the forward pass prediction and quantization ($f_P,q_P$) \eqref{fpqp} and backward pass to update $\bW_{i,t}^{\text{out}}$ \eqref{backpass}. Unlike \cite{Gupt1905:Predictive}, we do not exploit frequency correlations for predictive quantization, and the $8$ reservoirs for prediction of $8$ fed-back subcarriers are kept independent of each other.
-All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Reny\"i graph, with probability of edge connections being $0.2$, $\lambda=2$, $\bW^{\text{out/in}}_{i\in\{9k\},0}$ initialized randomly, $D_{\text{in}}=D_{\text{out}}=14$ (vectorized representation of $4\times2$ semi-unitary matrix, Section \ref{vectorize}) and $D_{\text{resv}}=60$.
+All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Reny\"i graph, with probability of edge connections being $0.2$, $\lambda=2$, $\bW^{\text{out/in}}_{i\in\{9k\},0}$ initialized randomly, $D_{\text{in}}=D_{\text{out}}=14$ (vectorized representation of $4\times2$ semi-unitary matrix, Section \ref{section3}) and $D_{\text{resv}}=60$.
 % All these 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being an Erdos-Reny\"i graph, with
 \begin{figure}
 \centering
 \includegraphics[width=0.4\textwidth]{images/table.pdf}
-\caption{The transmitter obtains feedback for $\{9k, k \in \{0,1,\ldots,7\}$ subcarriers, and uses $\tilde{\bU}_{i,t-1}$, along with $f_P,q_P$ \eqref{fpqp} to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley method  \eqref{eqn:cayley_i1_i2} to interpolate $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ non fed back subcarriers (green arrows}
+\caption{The transmitter obtains feedback for $\{9k, k \in \{0,1,\ldots,7\}$ subcarriers, and uses $\tilde{\bU}_{i,t-1}$, with $f_P,q_P$ to obtain $\tilde{\bU}_{i,t}$, illustrated in the figure via cyan arrows. For each time instant, the transmitter uses the Cayley method (Equation~\eqref{eqn:cayley_i1_i2}) for $\tilde{\bU}_{i,t}$ at $i\neq\{9k\}$ non fed back subcarriers (green arrows).}
 \label{table}
 \vspace{5pt}
 \end{figure}
