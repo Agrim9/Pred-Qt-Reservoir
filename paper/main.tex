@@ -180,7 +180,7 @@
 
   Precoding in MIMO wireless systems is essential for achieving
   channel capacity. However, the receiver should quantize and feed
-  back the precoder using very few bits of overhead. The precoder's
+  back the precoder using very few bits of overhead. The precoders'
   underlying manifold structure aids this feedback and allows the use
   of channel temporal/frequency correlation for predictive
   quantization. We introduce a reservoir computing framework for
@@ -205,14 +205,14 @@ Therefore, the receiver needs to quantize and feed back the precoders while resp
 Given the high dimensionality of precoders (which form a $N_T \times N_R$ complex-valued matrix, viz. $2N_TN_R$ real numbers), effective quantization with just a few bits poses a significant challenge.
 
 % Elaborate on each point (what people have done before) lecunnas
-Past work has used two inherent properties of the optimal precoders to enable effective quantization with just a few bits.
-First, the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that allows to work with effective lower dimensions, when performing operations over the manifold directly \cite{pitaval2013codebooks}.
+Past work has used two inherent properties of optimal precoders to enable effective quantization with just a few bits.
+First, the optimum precoders are not actually $2N_TN_R$ dimensional entities, but have an underlying manifold structure that has lower effective number of dimensions when performing operations over the manifold directly \cite{pitaval2013codebooks}.
 Second, these precoders are correlated in both time and frequency \cite{Gupt1905:Predictive}.
-Utilizing the available correlations permit the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
+Utilizing the available correlations permits the use of predictive quantization algorithms, which enable improvement of the quantization error with time.
 This improvement is obtained because of feeding back just the small extra information needed on top of the past fed back precoders, as compared to the new precoder information in the entirety.
 % Exploiting frequency correlations permits the use of interpolation algorithms, which reduce the feedback overhead in a single OFDM frame, by feeding back CSI only for certain subcarriers, and interpolating over the others.
 
-Combining the two inherent properties (viz. manifold structure and correlations) to frame manifold based predictive quantization algorithms, require a generalization of various well known linear algorithms for prediction, quantization and interpolation, to the underlying non-linear manifold structure. This is typically done by exploiting the differential geometry of the manifold and relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,krishnamachari2013geometry,chang2011adaptive}. Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the effective lower dimensions while framing the manifold operations to predict and quantize.
+Combining these two inherent properties (viz. manifold structure and correlations) to frame manifold based predictive quantization algorithms requires a generalization of various well known linear algorithms for prediction, quantization and interpolation, to the underlying non-linear manifold structure. This is typically done by exploiting the differential geometry of the manifold, and relevant past work in this direction has been presented in \cite{Gupt1905:Predictive,6891198,6545375,5671092,Li2016,krishnamachari2013geometry,chang2011adaptive}. Manifold based approaches for predictive quantization have provided significant performance benefits, given that they work with the lower number of effective dimensions while framing the manifold operations to predict and quantize.
 However, these approaches are non-trivial, since they require specific operations over the non-linear manifold differential geometry.
 In this paper, we aim to capture the above non-linear relations using a reservoir computing based predictive quantizer to exploit the temporal correlations effectively.
 The proposed framework offers a simple solution to the predictive quantization problem, which brings about ease of implementation, along with improved performance, when compared to \cite{6891198}, which proposed a corresponding manifold based method to the problem considered in this paper.
@@ -463,7 +463,7 @@ These 8 reservoirs are initialized with $\bA_{i\in\{9k\}}$ being Erdos-Reny\"i g
 \subsection{Quantization error, BER and Achievable Rate Results}
 \label{res}{}
 % To mitigate errors in prediction upon the presence of randomly appearing drastic events in wireless channels, such as sudden interferences and dynamic environments, only 100 channel evolutions are considered for the simulations, and the algorithm is re-starte.
-\noindent To ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile, we perform averaging over 100 independent channel realizations, each realization further evolved over 100 time instances as per the chosen doppler. Therefore, the quantization error, BER and achievable rate results are averaged over 10000 channel instances. From Fig. \ref{qtiz_err} it is evident that the RC framework is able to reduce the quantization error below what was obtained from the existing temporal correlations based predictive quantizer in \cite{6891198}. 
+\noindent To ensure that the simulation results hold in general for the chosen IEEE Pedestrian A channel profile, we perform averaging over 100 independent channel realizations, each realization further evolved over 100 time instances as per the chosen Doppler. Therefore, the quantization error, BER and achievable rate results are averaged over 10000 channel instances. From Fig. \ref{qtiz_err} it is evident that the RC framework is able to reduce the quantization error below what was obtained from the existing temporal correlations based predictive quantizer in \cite{6891198}. 
 \begin{figure}
 \centering
 \includegraphics[width=0.35\textwidth]{images/qtizErr.pdf}
@@ -505,8 +505,8 @@ For simulating the achievable rate, we quantize the sigma values ($\Sigma_{i,t}$
 
 We have presented a reservoir computing framework for predictive quantization of MIMO precoders by exploiting temporal correlations.
 Simulations reveal significant improvement in quantization error, BER, and achievable rate.
-The novelty that enables these improvements is the training method for the reservoir framework, which refines the predicted coarse estimates as the reservoir evolves.
-Our results have been obtained by exploiting only temporal correlations for predictive quantization, and can potentially improve if frequency correlations are also exploited simultaneously..
+The innovation that enables these improvements is the novel training method for the reservoir framework, which refines the predicted coarse estimates as the reservoir evolves.
+Our results have been obtained by exploiting only temporal correlations for predictive quantization, and can potentially improve if frequency correlations are also exploited simultaneously.
 Future work would focus on better reservoir frameworks, and a detailed analysis of impact on performance caused by choice of different reservoir parameters like $\bA,\text{tanh}(\cdot),$ and $D_{\text{resv}}$.
 \vspace{-4pt}
 
