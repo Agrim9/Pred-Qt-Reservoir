@@ -305,7 +305,7 @@ Using a randomly initialized $D_{\text{resv}}\times D_{\text{in}}$ input coupler
 \label{res_upd}
 \end{equation}
 where $\bA_i$ is the adjacency matrix that captures the reservoir dynamics, and $\text{tanh}$ is applied element wise.
-Typical choices for $\bA_i$ have been Erdos-Renyi graphs with an upper bounded maximum eigenvalue \cite{mosleh2017brain,pathak2017using}. The output of the reservoir is $\bp_{i,t}$ (vectorized representation of $\bP_{i,t}$), which denotes the predicted precoder at $i$-th subcarrier, $t$-th time instant.
+Typical choices for $\bA_i$ have been Erdos-Reny\"i graphs with an upper bounded maximum eigenvalue \cite{mosleh2017brain,pathak2017using}. The output of the reservoir is $\bp_{i,t}$ (vectorized representation of $\bP_{i,t}$), which denotes the predicted precoder at $i$-th subcarrier, $t$-th time instant.
 Therefore, the output of the reservoir is also a $D_{\text{in}}$ dimensional vector (viz. $D_{\text{out}}=D_{\text{in}}$).
 The output $\bp_{i,t}$ is obtained using a matrix transformation of the reservoir state $\br_{i,t}$ with $D_{\text{out}}\times D_{\text{resv}}$ output coupler matrix $\bW^{\text{out}}_{i,t-1}$, which forms the prediction function $f_P(\cdot)$ with $\tilde{\bU}_{i,t-1}$ as its argument, for the RC framework
 \begin{equation}
