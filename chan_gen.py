@@ -35,13 +35,16 @@ Nt=4
 Nr=2
 #---------------------------------------------------------------------------
 # Simulation Parameters
-number_simulations=1000
-num_chan_realisations=1
-fdts=1e-4
+number_simulations=100
+num_chan_realisations=100
+fdts=1e-3
 start_time=time.time()
 save=True
 vec_list=np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nr*(2*Nt-Nr+1)))
 qt_vec_list=np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nr*(2*Nt-Nr+1)))
+chan_inst = np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nt, Nr),dtype="complex")
+sigma_inst = np.zeros((num_chan_realisations,number_simulations,num_subcarriers,Nr),dtype="complex")
+
 qtCodebook=np.load('./Codebooks/Independent_qt/orth_cb_1000_20.npy')
 for chan_index in range(num_chan_realisations):
     print("-----------------------------------------------------------------------")
@@ -64,6 +67,11 @@ for chan_index in range(num_chan_realisations):
         # Get the channel matrix for num_subcarriers
         H_list=class_obj.get_Hlist()
         V_list, U_list,sigma_list= find_precoder_list(H_list,False)
+        # pdb.set_trace()
+        # pdb.set_trace()
+        chan_inst[chan_index][simulation_index] = np.array(H_list)
+        # pdb.set_trace()
+        sigma_inst[chan_index][simulation_index] = np.array(sigma_list)
         qt_vec_list[chan_index][simulation_index]=np.array([semiunitary_to_vec(qtCodebook[np.argmin([diff_frob_norm(U_list[i],codeword) for codeword in qtCodebook])])\
              for i in range(num_subcarriers)])
         vec_list[chan_index][simulation_index]=np.array([semiunitary_to_vec(U_list[i]) for i in range(num_subcarriers)])

@@ -52,10 +52,10 @@ class reservoir:
 signal.signal(signal.SIGINT, sigint_handler)
 # np.random.seed(0)
 np.random.seed(1)
-norm=3.5*1e-4
-data=np.load("./Fin_Data/BER/ped_10_100_4_2.npy")
-ind_qt_data=np.load("./Fin_Data/BER/qt_ped_10_100_4_2.npy")
-num_chans=10
+norm=1e-3
+data=np.load("./Fin_Eval/Uvec_norm3_100_100.npy")
+ind_qt_data=np.load("./Fin_Eval/Qt_Uvec_norm3_100_100.npy")
+num_chans=100
 num_evols=100
 Nt=4
 Nr=2

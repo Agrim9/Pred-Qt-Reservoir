@@ -32,8 +32,8 @@ def sH_lift(A,B,ret_vec=False):
 
 def vec_to_tangent(vec,n,p):
     C=np.diag(1j*vec[:p])
-    C[np.triu_indices(C.shape[0],1)]=1j*vec[p:p+(p*(p-1)/2)]+vec[p+(p*(p-1)/2):p+p*(p-1)]
-    C[np.tril_indices(C.shape[0],-1)]=1j*vec[p:p+(p*(p-1)/2)]-vec[p+(p*(p-1)/2):p+p*(p-1)]
+    C[np.triu_indices(C.shape[0],1)]=1j*vec[p:int(p+(p*(p-1)/2))]+vec[int(p+(p*(p-1)/2)):p+p*(p-1)]
+    C[np.tril_indices(C.shape[0],-1)]=1j*vec[p:int(p+(p*(p-1)/2))]-vec[int(p+(p*(p-1)/2)):p+p*(p-1)]
     vec_recon=1j*vec[p+p*(p-1):p+p*(p-1)+p*(n-p)]+vec[p+p*(p-1)+p*(n-p):p+p*(p-1)+2*p*(n-p)]
     B=np.matrix(np.reshape(vec_recon,(n-p,p)))
     T=np.bmat([[C,-B.H],[B,np.zeros((n-p,n-p))]])
@@ -425,7 +425,8 @@ class MIMO_TDL_Channel():
             self.tdl_channels[i].calc_frequency_response(inp_resp,freq_resp , 2*self.fft_size)
             # Store it in chan_freq in appropriate places across 64 matrices
             # print(freq_resp.to_numpy_ndarray().flatten()[0:64]-freq_resp.to_numpy_ndarray().flatten()[64:128])
-            chan_freq[:,row_idx][:,col_idx]=freq_resp.to_numpy_ndarray().flatten()[0:self.fft_size]
+            # pdb.set_trace()
+            chan_freq[:,row_idx][:,col_idx]=np.array(freq_resp).flatten()[0:self.fft_size]
         
         chan_freq_list=[]
         for i in range(self.fft_size):
